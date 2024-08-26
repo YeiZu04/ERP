@@ -17,3 +17,5 @@ obj/
 
 # Ignorar otros archivos temporales
 *.tmp
+
+*.AssemblyInfoInputs.cache
