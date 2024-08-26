@@ -75,3 +75,14 @@ D:\Gama\PPS\ERP-API\bin\Debug\net7.0\runtimes\win\lib\net6.0\System.Drawing.Comm
 D:\Gama\PPS\ERP-API\bin\Debug\net7.0\runtimes\win\lib\net6.0\System.Runtime.Caching.dll
 D:\Gama\PPS\ERP-API\bin\Debug\net7.0\runtimes\win\lib\net6.0\System.Security.Cryptography.ProtectedData.dll
 D:\Gama\PPS\ERP-API\bin\Debug\net7.0\runtimes\win\lib\net6.0\System.Windows.Extensions.dll
+C:\Users\ADMIN\source\repos\ERP-API\ERP-API\obj\Debug\net7.0\ERP-API.csproj.AssemblyReference.cache
+C:\Users\ADMIN\source\repos\ERP-API\ERP-API\obj\Debug\net7.0\ERP-API.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ADMIN\source\repos\ERP-API\ERP-API\obj\Debug\net7.0\ERP-API.AssemblyInfoInputs.cache
+C:\Users\ADMIN\source\repos\ERP-API\ERP-API\obj\Debug\net7.0\ERP-API.AssemblyInfo.cs
+C:\Users\ADMIN\source\repos\ERP-API\ERP-API\obj\Debug\net7.0\ERP-API.csproj.CoreCompileInputs.cache
+C:\Users\ADMIN\source\repos\ERP-API\ERP-API\obj\Debug\net7.0\ERP-API.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\ADMIN\source\repos\ERP-API\ERP-API\obj\Debug\net7.0\ERP-API.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\ADMIN\source\repos\ERP-API\ERP-API\obj\Debug\net7.0\ERP-API.sourcelink.json
+C:\Users\ADMIN\source\repos\ERP-API\ERP-API\obj\Debug\net7.0\ERP-API.dll
+C:\Users\ADMIN\source\repos\ERP-API\ERP-API\obj\Debug\net7.0\refint\ERP-API.dll
+C:\Users\ADMIN\source\repos\ERP-API\ERP-API\obj\Debug\net7.0\ERP-API.pdb
