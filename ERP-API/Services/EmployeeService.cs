@@ -1,5 +1,6 @@
 ﻿using ERP_API.DTOs;
 using ERP_API.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace ERP_API.Services
 {
@@ -13,18 +14,24 @@ namespace ERP_API.Services
         }
 
         public async Task RegisterEmployeeAsync(
-            RegisterPersonDto personDto,
-            RegisterUserDto userDto,
-            RegisterEmployeeDto employeeDto,
-            RegisterUserRoleDto userRoleDto,
-            RegisterCurriculumDto curriculumDto)
+     RegisterPersonDto personDto,
+     RegisterUserDto userDto,
+     RegisterEmployeeDto employeeDto,
+     RegisterUserRoleDto userRoleDto,
+     RegisterCurriculumDto curriculumDto)
         {
             using (var transaction = await _context.Database.BeginTransactionAsync())
             {
-
-                // con esto personDto.CompanyCode vamos a buscar el id de la compa;ia en la tabla company  donde el campo en el que tenemos que buscar es IdCompany
                 try
                 {
+                    // Obtener el ID de la compañía usando el código
+                    var companyId = await GetCompanyIdByCodeAsync(personDto.CompanyCode);
+
+                    if (companyId == null)
+                    {
+                        throw new Exception("La compañía con el código proporcionado no existe.");
+                    }
+
                     // 1. Registrar la Persona
                     var person = new Person
                     {
@@ -35,12 +42,12 @@ namespace ERP_API.Services
                         AddressPerson = personDto.Address,
                         NationalityPerson = personDto.Nationality,
                         IdentificationPerson = personDto.Identification,
-                        IdCompanyFkNavigation = personDto.CompanyCode
+                        IdCompanyFk = companyId.Value // Asignar la FK de la compañía
                     };
 
                     _context.Person.Add(person);
                     await _context.SaveChangesAsync();
-                     
+
                     // 2. Registrar el Usuario
                     var user = new User
                     {
@@ -97,6 +104,16 @@ namespace ERP_API.Services
                 }
             }
         }
+
+
+
+        private async Task<int?> GetCompanyIdByCodeAsync(string companyCode)
+        {
+            var company = await _context.Companies
+                                        .FirstOrDefaultAsync(c => c.CodeCompany == companyCode);
+            return company?.IdCompany;
+        }
+
 
     }
 }
