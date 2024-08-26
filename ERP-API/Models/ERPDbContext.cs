@@ -59,6 +59,8 @@ public partial class ERPDbContext : DbContext
 
     public virtual DbSet<WorkSchedule> WorkSchedules { get; set; }
 
+    public virtual DbSet<Person> Person { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Server=sql8010.site4now.net,1433;Database=db_aabc42_erp;User Id=db_aabc42_erp_admin;Password=ERPROOT123;");

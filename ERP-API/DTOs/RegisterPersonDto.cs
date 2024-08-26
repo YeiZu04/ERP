@@ -18,7 +18,6 @@ namespace ERP_API.DTOs
             [StringLength(100)]
             public string? Address { get; set; }
             [StringLength(100)]
-            public string? City { get; set; }
             public string? Nationality { get; set; }
             [StringLength(100)]
             public string? Identification { get; set; }
