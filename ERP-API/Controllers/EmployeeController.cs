@@ -14,9 +14,9 @@ public class EmployeeController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> RegisterEmployee(RegisterPersonDto personDto, RegisterUserDto userDto, RegisterEmployeeDto employeeDto, RegisterUserRoleDto userRoleDto, RegisterCurriculumDto curriculumDto)
+    public async Task<IActionResult> RegisterEmployee([FromBody] RegisterEmployee Employee)
     {
-        await _employeeService.RegisterEmployeeAsync(personDto, userDto, employeeDto, userRoleDto, curriculumDto);
+        await _employeeService.RegisterEmployeeAsync(Employee);
         return Ok();
     }
 }

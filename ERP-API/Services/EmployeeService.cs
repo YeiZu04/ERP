@@ -13,19 +13,14 @@ namespace ERP_API.Services
             _context = context;
         }
 
-        public async Task RegisterEmployeeAsync(
-     RegisterPersonDto personDto,
-     RegisterUserDto userDto,
-     RegisterEmployeeDto employeeDto,
-     RegisterUserRoleDto userRoleDto,
-     RegisterCurriculumDto curriculumDto)
+        public async Task RegisterEmployeeAsync(RegisterEmployee employeeDto)
         {
             using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
                     // Obtener el ID de la compañía usando el código
-                    var companyId = await GetCompanyIdByCodeAsync(personDto.CompanyCode);
+                    var companyId = await GetCompanyIdByCodeAsync(employeeDto.PersonDto.CompanyCode);
 
                     if (companyId == null)
                     {
@@ -35,35 +30,45 @@ namespace ERP_API.Services
                     // 1. Registrar la Persona
                     var person = new Person
                     {
-                        NamePerson = personDto.Name,
-                        LastNamePerson = personDto.LastName,
-                        AgePerson = personDto.Age,
-                        PhoneNumberPerson = personDto.PhoneNumber,
-                        AddressPerson = personDto.Address,
-                        NationalityPerson = personDto.Nationality,
-                        IdentificationPerson = personDto.Identification,
+                        NamePerson = employeeDto.PersonDto.Name,
+                        LastNamePerson = employeeDto.PersonDto.LastName,
+                        SecondLastNamePerson = employeeDto.PersonDto.SecondLastName,
+                        AgePerson = employeeDto.PersonDto.Age,
+                        PhoneNumberPerson = employeeDto.PersonDto.PhoneNumber,
+                        AddressPerson = employeeDto.PersonDto.Address,
+                        NationalityPerson = employeeDto.PersonDto.Nationality,
+                        StatePerson = 1,
+                        IdentificationPerson = employeeDto.PersonDto.Identification,
+                        EmailPerson = employeeDto.PersonDto.Email,
                         IdCompanyFk = companyId.Value // Asignar la FK de la compañía
                     };
 
                     _context.Person.Add(person);
                     await _context.SaveChangesAsync();
 
+                    // Obtener el ID de la persona recién insertada
+                    var personId = person.IdPerson;
+
                     // 2. Registrar el Usuario
                     var user = new User
                     {
-                        UserName = userDto.UserName,
-                        PasswordUser = userDto.Password,
-                        IdPersonFk = person.IdPerson // Asignar la FK al usuario
+                        UserName = employeeDto.UserDto.UserName,
+                        CreationDateUser = employeeDto.UserDto.CreationDateUser,
+                        PasswordUser = employeeDto.UserDto.Password,
+                        IdPersonFk = personId // Asignar la FK al usuario
                     };
 
                     _context.Users.Add(user);
                     await _context.SaveChangesAsync();
 
+                    // Obtener el ID del usuario recién insertado
+                    var userId = user.IdUser;
+
                     // 3. Asignar el Rol al Usuario
                     var userRole = new UserRole
                     {
-                        IdUserFk = user.IdUser,
-                        IdRoleFk = userRoleDto.IdRole
+                        IdUserFk = userId, // Asignar la FK del usuario
+                        IdRoleFk = employeeDto.UserRoleDto.IdRole
                     };
 
                     _context.UserRoles.Add(userRole);
@@ -72,25 +77,29 @@ namespace ERP_API.Services
                     // 4. Registrar el Empleado
                     var employee = new Employee
                     {
-                        DepartmentEmployee = employeeDto.DepartmentEmployee,
-                        HiringDateEmployee = employeeDto.HiringDateEmployee,
-                        NetSalaryEmployee = employeeDto.NetSalaryEmployee,
-                        PositionEmployee = employeeDto.PositionEmployee,
-                        IdUserFk = user.IdUser // Asignar la FK al usuario
+                        DepartmentEmployee = employeeDto.EmployeeDto.Department,
+                        HiringDateEmployee = employeeDto.EmployeeDto.HiringDate,
+                        NetSalaryEmployee = employeeDto.EmployeeDto.NetSalary,
+                        PositionEmployee = employeeDto.EmployeeDto.Position,
+                        VacationsEmployee = 0,
+                        IdUserFk = userId // Asignar la FK al usuario
                     };
 
                     _context.Employees.Add(employee);
                     await _context.SaveChangesAsync();
 
+                    // Obtener el ID del empleado recién insertado
+                    var employeeId = employee.IdEmployee;
+
                     // 5. Registrar el Currículum
                     var curriculum = new Curriculum
                     {
-                        IdEmployeeFk = employee.IdEmployee,
-                        CurriculumPath = curriculumDto.CurriculumPath,
-                        UpdateDate = curriculumDto.UpdateDate
+                        IdEmployeeFk = employeeId, // Asignar la FK del empleado
+                        PathFileCurriculum = employeeDto.CurriculumDto.PathFileCurriculum,
+                        DateUploaded = employeeDto.CurriculumDto.DateUpload
                     };
 
-                    _context.Curriculums.Add(curriculum);
+                    _context.Curriculum.Add(curriculum);
                     await _context.SaveChangesAsync();
 
                     // 6. Confirmar la transacción
@@ -104,6 +113,7 @@ namespace ERP_API.Services
                 }
             }
         }
+
 
 
 

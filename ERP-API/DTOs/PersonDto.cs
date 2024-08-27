@@ -2,7 +2,7 @@
 
 namespace ERP_API.DTOs
 {
-    public class RegisterPersonDto
+    public class PersonDto
     {
 
 
@@ -21,6 +21,9 @@ namespace ERP_API.DTOs
             public string? Nationality { get; set; }
             [StringLength(100)]
             public string? Identification { get; set; }
+            [StringLength(100)]
+            public string? Email { get; set; }
+
             [StringLength(100)]
             public string? CompanyCode { get; set; }
         

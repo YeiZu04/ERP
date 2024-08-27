@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\ADMIN\\source\\repos\\ERP-API\\ERP-API\\ERP-API.csproj": {}
+    "D:\\Gama\\PPS\\ERP-API\\ERP-API.csproj": {}
   },
   "projects": {
-    "C:\\Users\\ADMIN\\source\\repos\\ERP-API\\ERP-API\\ERP-API.csproj": {
+    "D:\\Gama\\PPS\\ERP-API\\ERP-API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\ADMIN\\source\\repos\\ERP-API\\ERP-API\\ERP-API.csproj",
+        "projectUniqueName": "D:\\Gama\\PPS\\ERP-API\\ERP-API.csproj",
         "projectName": "ERP-API",
-        "projectPath": "C:\\Users\\ADMIN\\source\\repos\\ERP-API\\ERP-API\\ERP-API.csproj",
-        "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\ADMIN\\source\\repos\\ERP-API\\ERP-API\\obj\\",
+        "projectPath": "D:\\Gama\\PPS\\ERP-API\\ERP-API.csproj",
+        "packagesPath": "C:\\Users\\gamar\\.nuget\\packages\\",
+        "outputPath": "D:\\Gama\\PPS\\ERP-API\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\gamar\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -110,7 +110,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.303\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.302\\RuntimeIdentifierGraph.json"
         }
       }
     }
