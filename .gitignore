@@ -2,8 +2,9 @@
 .vs/
 
 # Archivos de compilación
-bin/
-obj/
+/obj/
+/bin/
+
 
 # Archivos de configuración específicos del usuario
 *.suo

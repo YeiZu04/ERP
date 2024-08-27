@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v7.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v7.0": {
+      "Backend-API-ERP/1.0.0": {
+        "runtime": {
+          "Backend-API-ERP.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Backend-API-ERP/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
