@@ -2,7 +2,7 @@
 
 namespace ERP_API.DTOs
 {
-    public class RegisterEmployeeDto
+    public class EmployeeDto
     {
 
         public DateTime HiringDate { get; set; }

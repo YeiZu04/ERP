@@ -2,7 +2,7 @@
 
 namespace ERP_API.DTOs
 {
-    public class RegisterBenefitsEmployeeDto
+    public class BenefitsEmployeeDto
     {
         public int EmployeeId { get; set; }
 
