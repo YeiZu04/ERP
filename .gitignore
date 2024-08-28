@@ -20,3 +20,10 @@
 *.tmp
 
 *.AssemblyInfoInputs.cache
+
+*.AssemblyInfo.cs
+
+*.assets.cache
+
+*.AssemblyReference.cache
+/ERP-API/obj/Debug/net7.0/ERP-API.GeneratedMSBuildEditorConfig.editorconfig

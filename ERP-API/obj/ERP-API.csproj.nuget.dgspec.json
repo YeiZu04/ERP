@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Gama\\PPS\\ERP-API\\ERP-API.csproj": {}
+    "C:\\Users\\ADMIN\\source\\repos\\ERP-API\\ERP-API\\ERP-API.csproj": {}
   },
   "projects": {
-    "D:\\Gama\\PPS\\ERP-API\\ERP-API.csproj": {
+    "C:\\Users\\ADMIN\\source\\repos\\ERP-API\\ERP-API\\ERP-API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Gama\\PPS\\ERP-API\\ERP-API.csproj",
+        "projectUniqueName": "C:\\Users\\ADMIN\\source\\repos\\ERP-API\\ERP-API\\ERP-API.csproj",
         "projectName": "ERP-API",
-        "projectPath": "D:\\Gama\\PPS\\ERP-API\\ERP-API.csproj",
-        "packagesPath": "C:\\Users\\gamar\\.nuget\\packages\\",
-        "outputPath": "D:\\Gama\\PPS\\ERP-API\\obj\\",
+        "projectPath": "C:\\Users\\ADMIN\\source\\repos\\ERP-API\\ERP-API\\ERP-API.csproj",
+        "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\ADMIN\\source\\repos\\ERP-API\\ERP-API\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\gamar\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -61,6 +61,10 @@
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
               "version": "[7.0.19, )"
+            },
+            "Microsoft.EntityFrameworkCore.Analyzers": {
+              "target": "Package",
+              "version": "[7.0.20, )"
             },
             "Microsoft.EntityFrameworkCore.Design": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
@@ -110,7 +114,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.302\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.303\\RuntimeIdentifierGraph.json"
         }
       }
     }

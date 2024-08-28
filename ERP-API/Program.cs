@@ -1,12 +1,24 @@
 using ERP_API.Models;
+using ERP_API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configuración de CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        builder =>
+        {
+            builder.AllowAnyOrigin()
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
+        });
+});
 
 // Add services to the container.
 
@@ -36,12 +48,16 @@ builder.Services.AddDbContext<ERPDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
-builder.Services.AddIdentity<User, IdentityRole>()
-    .AddEntityFrameworkStores<ERPDbContext>()
-    .AddDefaultTokenProviders();
+
+builder.Services.AddScoped<ILogginService, LogginService>();
+
 
 
 var app = builder.Build();
+
+// Usar CORS
+app.UseCors("AllowAll");
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

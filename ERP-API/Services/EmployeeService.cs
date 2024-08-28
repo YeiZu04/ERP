@@ -52,7 +52,7 @@ namespace ERP_API.Services
                     // 2. Registrar el Usuario
                     var user = new User
                     {
-                        UserName = employeeDto.UserDto.UserName,
+                        NameUser = employeeDto.UserDto.UserName,
                         CreationDateUser = employeeDto.UserDto.CreationDateUser,
                         PasswordUser = employeeDto.UserDto.Password,
                         IdPersonFk = personId // Asignar la FK al usuario
