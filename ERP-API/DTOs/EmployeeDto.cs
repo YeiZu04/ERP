@@ -12,7 +12,7 @@ namespace ERP_API.DTOs
 
         [StringLength(100)]
         public string? Department { get; set; }
-        
+        public int UserId { get; set; }// opcional depende de donde se obtenga el id del nuevo User registrado.
 
     }
 }

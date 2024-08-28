@@ -1,5 +1,4 @@
 using ERP_API.Models;
-using ERP_API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -10,14 +9,8 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddHttpClient();
 
 builder.Services.AddControllers();
-builder.Services.AddScoped<EmployeeService>();
-builder.Services.AddScoped<PasswordHash>();
-builder.Services.AddScoped<SendEmail>();
-builder.Services.AddScoped<RandomGenerator>();
-builder.Services.AddScoped<ResponseService>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -43,6 +36,9 @@ builder.Services.AddDbContext<ERPDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
+builder.Services.AddIdentity<User, IdentityRole>()
+    .AddEntityFrameworkStores<ERPDbContext>()
+    .AddDefaultTokenProviders();
 
 
 var app = builder.Build();

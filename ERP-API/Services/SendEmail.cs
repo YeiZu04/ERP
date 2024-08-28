@@ -56,7 +56,6 @@ namespace ERP_API.Services
         
         public async Task SendEmailAsync(string toEmail, string subject, string body)
         {
-            /*
             bool isEmailValid = await VerifyEmailExists(toEmail);
 
             if (!isEmailValid)
@@ -64,8 +63,8 @@ namespace ERP_API.Services
                 // Log o manejar el caso donde el correo no es válido
                 throw new Exception("El correo no existe");
                 return;
-            }*/
-            
+            }
+
             string fromEmail = "studymateuniversidadnacional@gmail.com";
             string fromName = "Studymate";
             string fromPassword = "llgqlatqqarkvvwh"; // Token de autenticación de la aplicación
