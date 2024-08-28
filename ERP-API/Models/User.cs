@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace ERP_API.Models;
 
-public partial class User : IdentityUser
+public partial class User
 {
     public int IdUser { get; set; }
 

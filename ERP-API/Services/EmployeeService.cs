@@ -9,9 +9,18 @@ namespace ERP_API.Services
     {
         private readonly ERPDbContext _context;
 
-        public EmployeeService(ERPDbContext context)
+        private readonly PasswordHash _passwordHash;
+
+        private readonly SendEmail _emailSend;
+
+        private readonly RandomGenerator _randomGenerator;
+
+        public EmployeeService(ERPDbContext context, PasswordHash passwordHash, RandomGenerator randomGenerator, SendEmail sendEmail)
         {
             _context = context;
+            _passwordHash = passwordHash;
+            _randomGenerator = randomGenerator;
+            _emailSend = sendEmail;
         }
 
         public async Task<ApiResponse<string>> RegisterEmployeeAsync(RegisterEmployee employeeDto)
@@ -43,6 +52,7 @@ namespace ERP_API.Services
                             ErrorMessage = "Código de compañía inválido."
                         };
                     }
+                   
 
                     // 1. Registrar la Persona
                     var person = new Person
@@ -67,16 +77,20 @@ namespace ERP_API.Services
                     var personId = person.IdPerson;
 
                     // 2. Registrar el Usuario
+                    var ramdomPaswword = _randomGenerator.GenerateRandomPassword();
+                    var newPassword = _passwordHash.HashPassword(ramdomPaswword);
+
                     var user = new User
                     {
-                        UserName = employeeDto.UserDto.UserName,
+                        NameUser = employeeDto.UserDto.UserName,
                         CreationDateUser = employeeDto.UserDto.CreationDateUser,
-                        PasswordUser = employeeDto.UserDto.Password,
+                        PasswordUser = newPassword,
                         IdPersonFk = personId // Asignar la FK al usuario
                     };
 
                     _context.Users.Add(user);
                     await _context.SaveChangesAsync();
+
 
                     // Obtener el ID del usuario recién insertado
                     var userId = user.IdUser;
@@ -119,12 +133,16 @@ namespace ERP_API.Services
                     _context.Curriculum.Add(curriculum);
                     await _context.SaveChangesAsync();
 
+                    // Devolver el éxito con el ID del empleado registrado y envia el correo con tu contraseña.
+                    await _emailSend.SendEmailAsync(employeeDto.PersonDto.Email, "Bienvenido a la empresa", "Tu password será:  " + ramdomPaswword);
+
                     // 6. Confirmar la transacción
                     await transaction.CommitAsync();
 
-                    // Devolver el éxito con el ID del empleado registrado
+                    
                     return new ApiResponse<string>
                     {
+
                         Success = true,
                         Data = employeeId.ToString()
                     };
