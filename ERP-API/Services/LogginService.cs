@@ -9,43 +9,53 @@ using System.Text;
 
 namespace ERP_API.Services
 {
-    public interface ILogginService{
+    public interface ILogginService
+    {
         Task<string> Authenticate(LogginDto loginDTO);
+        Task Logout();
     }
 
-    public class LogginService : ILogginService{
+    public class LogginService : ILogginService
+    {
         private readonly ERPDbContext _context;
         private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public LogginService(ERPDbContext context, IConfiguration configuration){
+        public LogginService(ERPDbContext context, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+        {
             _context = context;
             _configuration = configuration;
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<string> Authenticate(LogginDto loginDTO){
+        public async Task<string> Authenticate(LogginDto loginDTO)
+        {
             var user = await _context.Users
                 .Include(u => u.IdPersonFkNavigation)
                 .Include(u => u.UserRoles)
-                    .ThenInclude(ur => ur.IdRoleFkNavigation) // Incluye los roles a través de la propiedad de navegación
+                    .ThenInclude(ur => ur.IdRoleFkNavigation)
                 .FirstOrDefaultAsync(u => u.NameUser == loginDTO.Username && u.PasswordUser == loginDTO.Password);
 
             if (user == null)
                 throw new UnauthorizedAccessException("Invalid credentials");
 
-            var claims = new List<Claim>{
+            var claims = new List<Claim>
+            {
                 new Claim(ClaimTypes.Name, user.NameUser)
             };
 
-            // Añadir los roles a los claims
-            foreach (var userRole in user.UserRoles){
-                if (userRole.IdRoleFkNavigation != null){
+            foreach (var userRole in user.UserRoles)
+            {
+                if (userRole.IdRoleFkNavigation != null)
+                {
                     claims.Add(new Claim(ClaimTypes.Role, userRole.IdRoleFkNavigation.TypeRole));
                 }
             }
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
-            var tokenDescriptor = new SecurityTokenDescriptor{
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
                 Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -53,8 +63,8 @@ namespace ERP_API.Services
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var jwtToken = tokenHandler.WriteToken(token);
 
-            // Crear la nueva sesión
-            var session = new Session{
+            var session = new Session
+            {
                 TokenSession = jwtToken,
                 CreationDateSession = DateTime.Now,
                 ExpirationDateSession = DateTime.Now.AddHours(1),
@@ -68,7 +78,22 @@ namespace ERP_API.Services
             return jwtToken;
         }
 
+        public async Task Logout()
+        {
+            var token = _httpContextAccessor.HttpContext.Items["UserToken"]?.ToString();
 
+            if (string.IsNullOrEmpty(token))
+                throw new InvalidOperationException("Token no encontrado.");
 
+            var session = await _context.Sessions.FirstOrDefaultAsync(s => s.TokenSession == token);
+
+            if (session == null)
+            {
+                throw new InvalidOperationException("Sesión no encontrada.");
+            }
+
+            _context.Sessions.Remove(session);
+            await _context.SaveChangesAsync();
+        }
     }
 }

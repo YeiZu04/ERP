@@ -29,5 +29,20 @@ namespace ERP_API.Controllers
                 return Unauthorized(ex.Message);
             }
         }
+
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            try
+            {
+                await _authService.Logout();
+                return Ok("Sesión cerrada exitosamente.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
     }
 }
