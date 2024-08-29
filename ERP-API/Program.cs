@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 
-// Configuración de CORS
+// Configuraciï¿½n de CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
@@ -23,14 +23,26 @@ builder.Services.AddCors(options =>
 });
 
 // Add services to the container.
-builder.Services.AddControllers();
 
-// Configuración de Swagger para JWT
+builder.Services.AddHttpClient();
+
+builder.Services.AddControllers();
+builder.Services.AddScoped<EmployeeService>();
+builder.Services.AddScoped<PasswordHash>();
+builder.Services.AddScoped<SendEmail>();
+builder.Services.AddScoped<RandomGenerator>();
+//builder.Services.AddScoped<Respo>();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+
+// Configuraciï¿½n de Swagger para JWT
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "ERP API", Version = "v1" });
 
-    // Configuración de JWT en Swagger
+    // Configuraciï¿½n de JWT en Swagger
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -57,7 +69,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// Configuración de JWT
+// Configuraciï¿½n de JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
@@ -72,14 +84,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     };
 });
 
-// Configuración de DbContext
+// Configuraciï¿½n de DbContext
 builder.Services.AddDbContext<ERPDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 
 // Registro de servicios
 builder.Services.AddScoped<ILogginService, LogginService>();
 // Registro de IHttpContextAccessor
 builder.Services.AddHttpContextAccessor();
+
 
 var app = builder.Build();
 
