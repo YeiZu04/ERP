@@ -1,7 +1,7 @@
 ﻿using ERP_API.DTOs;
 using ERP_API.Models;
 using Microsoft.EntityFrameworkCore;
-using ERP_API.Services.Api_Response;
+using  ERP_API.Services.Api_Response;
 
 namespace ERP_API.Services
 {
@@ -15,30 +15,33 @@ namespace ERP_API.Services
 
         private readonly RandomGenerator _randomGenerator;
 
+        
+
         public EmployeeService(ERPDbContext context, PasswordHash passwordHash, RandomGenerator randomGenerator, SendEmail sendEmail)
         {
             _context = context;
             _passwordHash = passwordHash;
             _randomGenerator = randomGenerator;
             _emailSend = sendEmail;
+       
         }
-
-        public async Task<ApiResponse<string>> RegisterEmployeeAsync(RegisterEmployee employeeDto)
+        
+        public async Task<Api_Response.Api_Response.ApiResponse <string>> RegisterEmployeeAsync(RegisterEmployee employeeDto)
         {
             using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
-
+                   
                     // Obtener el ID de la compañía usando el código
                     var companyId = await GetCompanyIdByCodeAsync(employeeDto.PersonDto.CompanyCode);
 
                     if (companyId == null)
                     {
-                        return new ApiResponse<string>
+                        return new Api_Response.Api_Response.ApiResponse<string>
                         {
                             Success = false,
-                            ErrorCode = ErrorCode.InvalidInput,
+                            ErrorCode = Api_Response.Api_Response.ErrorCode.InvalidInput,
                             ErrorMessage = "Código de compañía inválido."
                         };
                     }
@@ -58,16 +61,13 @@ namespace ERP_API.Services
                     // Verificar si el correo (usuario) ya existe en la empresa 
                     if (await UserExistsByEmail(employeeDto.PersonDto.Email, companyId.Value))
                     {
-                        return new ApiResponse<string>
+                        return new Api_Response.Api_Response.ApiResponse<string>
                         {
                             Success = false,
-                            ErrorCode = ErrorCode.UserAlreadyExists,
+                            ErrorCode = Api_Response.Api_Response.ErrorCode.UserAlreadyExists,
                             ErrorMessage = "Este correo electronico ya existe en esta empresa."
                         };
                     }
-
-
-                   
 
                     // 1. Registrar la Persona
                     var person = new Person
@@ -155,7 +155,7 @@ namespace ERP_API.Services
                     await transaction.CommitAsync();
 
                     
-                    return new ApiResponse<string>
+                    return new Api_Response.Api_Response.ApiResponse<string>
                     {
 
                         Success = true,
@@ -168,10 +168,10 @@ namespace ERP_API.Services
                     await transaction.RollbackAsync();
 
                     // Manejar el error y devolver un ApiResponse con el código y mensaje de error
-                    return new ApiResponse<string>
+                    return new Api_Response.Api_Response.ApiResponse<string>
                     {
                         Success = false,
-                        ErrorCode = ErrorCode.GeneralError,
+                        ErrorCode = Api_Response.Api_Response.ErrorCode.GeneralError,
                         ErrorMessage = $"Ocurrió un error durante el registro: {ex.Message}"
                     };
                 }
