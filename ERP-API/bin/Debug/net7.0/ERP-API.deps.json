@@ -11,6 +11,7 @@
           "Microsoft.AspNetCore.Authentication.JwtBearer": "7.0.0",
           "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "7.0.20",
           "Microsoft.AspNetCore.OpenApi": "7.0.19",
+          "Microsoft.EntityFrameworkCore.Analyzers": "7.0.20",
           "Microsoft.EntityFrameworkCore.Design": "7.0.20",
           "Microsoft.EntityFrameworkCore.SqlServer": "7.0.20",
           "Microsoft.EntityFrameworkCore.Tools": "7.0.20",
