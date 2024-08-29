@@ -14,7 +14,7 @@ namespace ERP_API.Services
         public SendEmail(HttpClient client)
         {
             _client = client;
-            _client.BaseAddress = new Uri("https://api.zerobounce.net/v2/");
+            _client.BaseAddress = new Uri("https://api.zerobounce.net/v2/validate");
             apiKey = "663b6f903a954b77a14e030e3ea1560b";
         }
 
@@ -56,6 +56,7 @@ namespace ERP_API.Services
         
         public async Task SendEmailAsync(string toEmail, string subject, string body)
         {
+            /*
             bool isEmailValid = await VerifyEmailExists(toEmail);
 
             if (!isEmailValid)
@@ -63,8 +64,8 @@ namespace ERP_API.Services
                 // Log o manejar el caso donde el correo no es válido
                 throw new Exception("El correo no existe");
                 return;
-            }
-
+            }*/
+            
             string fromEmail = "studymateuniversidadnacional@gmail.com";
             string fromName = "Studymate";
             string fromPassword = "llgqlatqqarkvvwh"; // Token de autenticación de la aplicación
