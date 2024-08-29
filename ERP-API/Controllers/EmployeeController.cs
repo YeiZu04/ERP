@@ -8,6 +8,7 @@ using ERP_API.Services.Api_Response;
 public class EmployeeController : ControllerBase
 {
     private readonly EmployeeService _employeeService;
+    
 
     public EmployeeController(EmployeeService employeeService)
     {
@@ -34,13 +35,13 @@ public class EmployeeController : ControllerBase
         {
             // Devuelve una respuesta con el código de error adecuado
             return result.ErrorCode switch
-            {
-                ErrorCode.UserAlreadyExists => Conflict(new { message = result.ErrorMessage }),
-                ErrorCode.InvalidInput => BadRequest(new { message = result.ErrorMessage }),
-                ErrorCode.NotFound => NotFound(new { message = result.ErrorMessage }),
-                ErrorCode.errorDataBase => StatusCode(500, new { message = result.ErrorMessage }),
-                _ => StatusCode(500, new { message = result.ErrorMessage })
-            };
+          {
+              Api_Response.ErrorCode.UserAlreadyExists => Conflict(new { message = result.ErrorMessage }),
+              Api_Response.ErrorCode.InvalidInput => BadRequest(new { message = result.ErrorMessage }),
+              Api_Response.ErrorCode.NotFound => NotFound(new { message = result.ErrorMessage }),
+              Api_Response.ErrorCode.errorDataBase => StatusCode(500, new { message = result.ErrorMessage }),
+              _ => StatusCode(500, new { message = result.ErrorMessage })
+          };
         }
     }
 }
