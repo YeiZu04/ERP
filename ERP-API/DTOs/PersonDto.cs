@@ -26,7 +26,9 @@ namespace ERP_API.DTOs
 
             [StringLength(100)]
             public string? CompanyCode { get; set; }
-        
+
+            public Guid UUID { get; set; }
+
 
     }
 }

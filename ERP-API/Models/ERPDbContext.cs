@@ -333,6 +333,9 @@ public partial class ERPDbContext : DbContext
             entity.HasOne(d => d.IdCompanyFkNavigation).WithMany(p => p.People)
                 .HasForeignKey(d => d.IdCompanyFk)
                 .HasConstraintName("FK_Person_Company");
+            entity.Property(e => e.PersonUUID)
+                .HasColumnName("UUID_person")
+                .HasColumnType("uniqueidentifier");
         });
 
         modelBuilder.Entity<Role>(entity =>
@@ -346,6 +349,9 @@ public partial class ERPDbContext : DbContext
                 .HasMaxLength(100)
                 .IsFixedLength()
                 .HasColumnName("type_role");
+            entity.Property(e => e.Description)
+                .HasColumnName("Description_role")
+                .HasColumnType("nvarchar(max)");
         });
 
         modelBuilder.Entity<RolePermission>(entity =>

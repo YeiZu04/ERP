@@ -1,7 +1,8 @@
 ﻿using ERP_API.DTOs;
 using ERP_API.Models;
 using Microsoft.EntityFrameworkCore;
-using  ERP_API.Services.Api_Response;
+using ERP_API.Services.Tools;
+using Newtonsoft.Json.Linq;
 
 namespace ERP_API.Services
 {
@@ -15,19 +16,45 @@ namespace ERP_API.Services
 
         private readonly RandomGenerator _randomGenerator;
 
-        
+        private readonly BearerCode _bearerCode;
 
-        public EmployeeService(ERPDbContext context, PasswordHash passwordHash, RandomGenerator randomGenerator, SendEmail sendEmail)
+
+
+        public EmployeeService(ERPDbContext context, PasswordHash passwordHash, RandomGenerator randomGenerator, SendEmail sendEmail, BearerCode bearerCode )
         {
             _context = context;
             _passwordHash = passwordHash;
             _randomGenerator = randomGenerator;
             _emailSend = sendEmail;
-       
+            _bearerCode = bearerCode;
+            
         }
         
-        public async Task<Api_Response.Api_Response.ApiResponse <string>> RegisterEmployeeAsync(RegisterEmployee employeeDto)
+        public async Task<Api_Response.ApiResponse <string>> RegisterEmployeeAsync(RegisterEmployee employeeDto)
         {
+
+            var responseJWT = await _bearerCode.VerficationCode(employeeDto.JwtToken);
+            if (responseJWT.Success == false)
+            {
+                return new Api_Response.ApiResponse<string>
+                {
+                    Success = false,
+                    ErrorCode = responseJWT.ErrorCode,
+                    ErrorMessage = responseJWT.ErrorMessage
+                };
+            }
+
+            var session = await _context.Sessions
+              .Include(s => s.IdUserFkNavigation) // Relación con User
+                  .ThenInclude(u => u.IdPersonFkNavigation) // Relación con Person
+                  .ThenInclude(p => p.IdCompanyFkNavigation) // Relación con Company
+              .FirstOrDefaultAsync(s => s.TokenSession == employeeDto.JwtToken); // Filtrar por el token JWT
+
+            var idCompany = session?.IdUserFkNavigation?.IdPersonFkNavigation?.IdCompanyFkNavigation;
+            if (idCompany == null)
+            {
+               
+            }
             using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
@@ -38,10 +65,10 @@ namespace ERP_API.Services
 
                     if (companyId == null)
                     {
-                        return new Api_Response.Api_Response.ApiResponse<string>
+                        return new Api_Response.ApiResponse<string>
                         {
                             Success = false,
-                            ErrorCode = Api_Response.Api_Response.ErrorCode.InvalidInput,
+                            ErrorCode = Api_Response.ErrorCode.InvalidInput,
                             ErrorMessage = "Código de compañía inválido."
                         };
                     }
@@ -61,10 +88,10 @@ namespace ERP_API.Services
                     // Verificar si el correo (usuario) ya existe en la empresa 
                     if (await UserExistsByEmail(employeeDto.PersonDto.Email, companyId.Value))
                     {
-                        return new Api_Response.Api_Response.ApiResponse<string>
+                        return new Api_Response.ApiResponse<string>
                         {
                             Success = false,
-                            ErrorCode = Api_Response.Api_Response.ErrorCode.UserAlreadyExists,
+                            ErrorCode = Api_Response.ErrorCode.UserAlreadyExists,
                             ErrorMessage = "Este correo electronico ya existe en esta empresa."
                         };
                     }
@@ -82,7 +109,9 @@ namespace ERP_API.Services
                         StatePerson = 1,
                         IdentificationPerson = employeeDto.PersonDto.Identification,
                         EmailPerson = employeeDto.PersonDto.Email,
+                        PersonUUID = Guid.NewGuid(),
                         IdCompanyFk = companyId.Value // Asignar la FK de la compañía
+                        
                     };
 
                     _context.Person.Add(person);
@@ -155,11 +184,11 @@ namespace ERP_API.Services
                     await transaction.CommitAsync();
 
                     
-                    return new Api_Response.Api_Response.ApiResponse<string>
+                    return new Api_Response.ApiResponse<string>
                     {
 
                         Success = true,
-                        Data = employeeId.ToString()
+                        Data = "registro exitoso"
                     };
                 }
                 catch (Exception ex)
@@ -168,10 +197,10 @@ namespace ERP_API.Services
                     await transaction.RollbackAsync();
 
                     // Manejar el error y devolver un ApiResponse con el código y mensaje de error
-                    return new Api_Response.Api_Response.ApiResponse<string>
+                    return new Api_Response.ApiResponse<string>
                     {
                         Success = false,
-                        ErrorCode = Api_Response.Api_Response.ErrorCode.GeneralError,
+                        ErrorCode = Api_Response.ErrorCode.GeneralError,
                         ErrorMessage = $"Ocurrió un error durante el registro: {ex.Message}"
                     };
                 }

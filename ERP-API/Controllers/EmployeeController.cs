@@ -1,7 +1,8 @@
 ﻿using ERP_API.DTOs;
 using ERP_API.Services;
+using ERP_API.Services.Tools;
 using Microsoft.AspNetCore.Mvc;
-using ERP_API.Services.Api_Response;
+
 
 [ApiController]
 [Route("api/[controller]")]
@@ -24,7 +25,7 @@ public class EmployeeController : ControllerBase
         // Verifica si la operación fue exitosa
         if (result.Success)
         {
-            // Devuelve una respuesta 200 OK con el ID del empleado registrado
+            // Devuelve una respuesta 200 OK 
             return Ok(new
             {
                 message = "Empleado registrado exitosamente",

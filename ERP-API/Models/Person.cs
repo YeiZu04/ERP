@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ERP_API.Models;
 
@@ -28,6 +29,9 @@ public partial class Person
     public string? EmailPerson { get; set; }
 
     public int? IdCompanyFk { get; set; }
+
+    [Column("UUID_person")]
+    public Guid PersonUUID { get; set; } // Mapeo de la columna UUID_person// Nuevo campo UUID
 
     public virtual ICollection<Candidate> Candidates { get; set; } = new List<Candidate>();
 

@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Net.Mail;
 using System.Threading.Tasks;
 
-namespace ERP_API.Services
+namespace ERP_API.Services.Tools
 {
     public class SendEmail
     {
@@ -53,7 +53,7 @@ namespace ERP_API.Services
 
             return ipAddress;
         }
-        
+
         public async Task SendEmailAsync(string toEmail, string subject, string body)
         {
             /*
@@ -65,7 +65,7 @@ namespace ERP_API.Services
                 throw new Exception("El correo no existe");
                 return;
             }*/
-            
+
             string fromEmail = "studymateuniversidadnacional@gmail.com";
             string fromName = "Studymate";
             string fromPassword = "llgqlatqqarkvvwh"; // Token de autenticación de la aplicación

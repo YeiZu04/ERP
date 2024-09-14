@@ -1,6 +1,6 @@
 using ERP_API.Models;
 using ERP_API.Services;
-using ERP_API.Services.Api_Response;
+using ERP_API.Services.Tools;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -27,8 +27,10 @@ builder.Services.AddCors(options =>
 // Add services to the container.
 
 builder.Services.AddHttpClient();
+builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddControllers();
+builder.Services.AddScoped<BearerCode>();
 builder.Services.AddScoped<EmployeeService>();
 builder.Services.AddScoped<PasswordHash>();
 builder.Services.AddScoped<SendEmail>();
@@ -42,7 +44,7 @@ builder.Services.AddSwaggerGen();
 // Configuraci�n de Swagger para JWT
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "ERP API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "ERP", Version = "v1" });
 
     // Configuraci�n de JWT en Swagger
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -92,9 +94,10 @@ builder.Services.AddDbContext<ERPDbContext>(options =>
 
 
 // Registro de servicios
-builder.Services.AddScoped<ILogginService, LogginService>();
+builder.Services.AddScoped<ILogginService, LoginService>();
 // Registro de IHttpContextAccessor
 builder.Services.AddHttpContextAccessor();
+
 
 
 var app = builder.Build();
