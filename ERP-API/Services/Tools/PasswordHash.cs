@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace ERP_API.Services
+namespace ERP_API.Services.Tools
 {
     public class PasswordHash
     {

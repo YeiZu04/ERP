@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace ERP_API.Services
+namespace ERP_API.Services.Tools
 {
     public class RandomGenerator
     {

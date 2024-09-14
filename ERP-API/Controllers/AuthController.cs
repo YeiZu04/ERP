@@ -17,7 +17,7 @@ namespace ERP_API.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LogginDto loginDTO)
+        public async Task<IActionResult> Login([FromBody] LoginDto loginDTO)
         {
             try
             {

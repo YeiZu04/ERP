@@ -1,6 +1,6 @@
-﻿namespace ERP_API.Services.Api_Response
+﻿namespace ERP_API.Services.Tools
 {
-     public class Api_Response
+    public class Api_Response
     {
         public enum ErrorCode
         {
