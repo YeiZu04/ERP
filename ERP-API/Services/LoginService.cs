@@ -5,18 +5,15 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using ERP_API.Interfaces;
 using System.Security.Claims;
 using System.Text;
 
 namespace ERP_API.Services
 {
-    public interface ILogginService
-    {
-        Task<Api_Response.ApiResponse<string>> Authenticate(LoginDto loginDTO);
-        Task<Api_Response.ApiResponse<string>> Logout(string codeJwt);
-    }
+    
 
-    public class LoginService : ILogginService
+    public class LoginService : IlogginService
     {
         private readonly ERPDbContext _context;
         private readonly IConfiguration _configuration;
