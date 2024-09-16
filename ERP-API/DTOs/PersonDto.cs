@@ -7,22 +7,22 @@ namespace ERP_API.DTOs
 
 
             [StringLength(100)]
-            public string? Name { get; set; }
+            public string? NamePerson { get; set; }
             [StringLength(100)]
-            public string? LastName { get; set; }
+            public string? LastNamePerson { get; set; }
             [StringLength(100)]     
-            public string? SecondLastName { get; set; }
-            public double? Age { get; set; }
+            public string? SecondLastNamePerson { get; set; }
+            public double? AgePerson { get; set; }
             [StringLength(100)]
-            public string? PhoneNumber { get; set; }
+            public string? PhoneNumberPerson { get; set; }
             [StringLength(100)]
-            public string? Address { get; set; }
+            public string? AddressPerson { get; set; }
             [StringLength(100)]
-            public string? Nationality { get; set; }
+            public string? NationalityPerson { get; set; }
             [StringLength(100)]
-            public string? Identification { get; set; }
+            public string? IdentificationPerson { get; set; }
             [StringLength(100)]
-            public string? Email { get; set; }
+            public string? EmailPerson { get; set; }
 
             [StringLength(100)]
             public string? CompanyCode { get; set; }

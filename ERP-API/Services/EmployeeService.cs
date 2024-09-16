@@ -3,6 +3,7 @@ using ERP_API.Models;
 using Microsoft.EntityFrameworkCore;
 using ERP_API.Services.Tools;
 using Newtonsoft.Json.Linq;
+using AutoMapper;
 
 namespace ERP_API.Services
 {
@@ -18,63 +19,53 @@ namespace ERP_API.Services
 
         private readonly BearerCode _bearerCode;
 
+        private readonly IMapper _Mapper;
 
 
-        public EmployeeService(ERPDbContext context, PasswordHash passwordHash, RandomGenerator randomGenerator, SendEmail sendEmail, BearerCode bearerCode )
+
+        public EmployeeService(ERPDbContext context, PasswordHash passwordHash, RandomGenerator randomGenerator, SendEmail sendEmail, BearerCode bearerCode, IMapper mapper )
         {
             _context = context;
             _passwordHash = passwordHash;
             _randomGenerator = randomGenerator;
             _emailSend = sendEmail;
             _bearerCode = bearerCode;
+            _Mapper = mapper;
             
         }
         
-        public async Task<Api_Response.ApiResponse <string>> RegisterEmployeeAsync(RegisterEmployee employeeDto)
+        public async Task<Api_Response.ApiResponse <string>> RegisterEmployeeAsync(RegisterEmployee ReqEmployeeDto)
         {
 
-            var responseJWT = await _bearerCode.VerficationCode(employeeDto.JwtToken);
-            if (responseJWT.Success == false)
-            {
-                return new Api_Response.ApiResponse<string>
-                {
-                    Success = false,
-                    ErrorCode = responseJWT.ErrorCode,
-                    ErrorMessage = responseJWT.ErrorMessage
-                };
-            }
 
-            var session = await _context.Sessions
-              .Include(s => s.IdUserFkNavigation) // Relación con User
-                  .ThenInclude(u => u.IdPersonFkNavigation) // Relación con Person
-                  .ThenInclude(p => p.IdCompanyFkNavigation) // Relación con Company
-              .FirstOrDefaultAsync(s => s.TokenSession == employeeDto.JwtToken); // Filtrar por el token JWT
 
-            var idCompany = session?.IdUserFkNavigation?.IdPersonFkNavigation?.IdCompanyFkNavigation;
-            if (idCompany == null)
-            {
-               
-            }
             using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
-                   
-                    // Obtener el ID de la compañía usando el código
-                    var companyId = await GetCompanyIdByCodeAsync(employeeDto.PersonDto.CompanyCode);
 
-                    if (companyId == null)
+                    var responseJWT = await _bearerCode.VerficationCode(ReqEmployeeDto.JwtToken);
+                    if (responseJWT.Success == false)
                     {
                         return new Api_Response.ApiResponse<string>
                         {
                             Success = false,
-                            ErrorCode = Api_Response.ErrorCode.InvalidInput,
-                            ErrorMessage = "Código de compañía inválido."
+                            ErrorCode = responseJWT.ErrorCode,
+                            ErrorMessage = responseJWT.ErrorMessage
                         };
                     }
+
+                    var session = await _context.Sessions
+                      .Include(s => s.IdUserFkNavigation) // Relación con User
+                          .ThenInclude(u => u.IdPersonFkNavigation) // Relación con Person
+                          .ThenInclude(p => p.IdCompanyFkNavigation) // Relación con Company
+                      .FirstOrDefaultAsync(s => s.TokenSession == ReqEmployeeDto.JwtToken); // Filtrar por el token JWT
+
+                    var companyId = session?.IdUserFkNavigation?.IdPersonFkNavigation?.IdCompanyFkNavigation;
+
                     /*
                     // verificar si el correo propocionado existe en algun SmtpClient
-                    if ( await _emailSend.VerifyEmailExists(employeeDto.PersonDto.Email))
+                    if ( await _emailSend.VerifyEmailExists(ReqEmployeeDto.PersonDto.Email))
                     {
                         return new ApiResponse<string>
                         {
@@ -86,7 +77,8 @@ namespace ERP_API.Services
                     */
 
                     // Verificar si el correo (usuario) ya existe en la empresa 
-                    if (await UserExistsByEmail(employeeDto.PersonDto.Email, companyId.Value))
+                    Console.WriteLine(companyId);
+                    if (await UserExistsByEmail(ReqEmployeeDto?.PersonDto?.EmailPerson, companyId.IdCompany))
                     {
                         return new Api_Response.ApiResponse<string>
                         {
@@ -97,22 +89,9 @@ namespace ERP_API.Services
                     }
 
                     // 1. Registrar la Persona
-                    var person = new Person
-                    {
-                        NamePerson = employeeDto.PersonDto.Name,
-                        LastNamePerson = employeeDto.PersonDto.LastName,
-                        SecondLastNamePerson = employeeDto.PersonDto.SecondLastName,
-                        AgePerson = employeeDto.PersonDto.Age,
-                        PhoneNumberPerson = employeeDto.PersonDto.PhoneNumber,
-                        AddressPerson = employeeDto.PersonDto.Address,
-                        NationalityPerson = employeeDto.PersonDto.Nationality,
-                        StatePerson = 1,
-                        IdentificationPerson = employeeDto.PersonDto.Identification,
-                        EmailPerson = employeeDto.PersonDto.Email,
-                        PersonUUID = Guid.NewGuid(),
-                        IdCompanyFk = companyId.Value // Asignar la FK de la compañía
-                        
-                    };
+                    var person = _Mapper.Map<Person>(ReqEmployeeDto?.PersonDto);
+                    person.IdCompanyFk = companyId.IdCompany;
+                    person.PersonUUID =  Guid.NewGuid();
 
                     _context.Person.Add(person);
                     await _context.SaveChangesAsync();
@@ -126,8 +105,8 @@ namespace ERP_API.Services
 
                     var user = new User
                     {
-                        NameUser = employeeDto.UserDto.UserName,
-                        CreationDateUser = employeeDto.UserDto.CreationDateUser,
+                        NameUser = ReqEmployeeDto.UserDto.UserName,
+                        CreationDateUser = ReqEmployeeDto.UserDto.CreationDateUser,
                         PasswordUser = newPassword,
                         IdPersonFk = personId // Asignar la FK al usuario
                     };
@@ -143,22 +122,16 @@ namespace ERP_API.Services
                     var userRole = new UserRole
                     {
                         IdUserFk = userId, // Asignar la FK del usuario
-                        IdRoleFk = employeeDto.UserRoleDto.IdRole
+                        IdRoleFk = ReqEmployeeDto?.UserRoleDto?.IdRole
                     };
 
                     _context.UserRoles.Add(userRole);
                     await _context.SaveChangesAsync();
 
                     // 4. Registrar el Empleado
-                    var employee = new Employee
-                    {
-                        DepartmentEmployee = employeeDto.EmployeeDto.Department,
-                        HiringDateEmployee = employeeDto.EmployeeDto.HiringDate,
-                        NetSalaryEmployee = employeeDto.EmployeeDto.NetSalary,
-                        PositionEmployee = employeeDto.EmployeeDto.Position,
-                        VacationsEmployee = 0,
-                        IdUserFk = userId // Asignar la FK al usuario
-                    };
+                    var employee = _Mapper.Map<Employee>(ReqEmployeeDto?.EmployeeDto);
+                    employee.IdUserFk =userId;
+                    employee.VacationsEmployee = 0;
 
                     _context.Employees.Add(employee);
                     await _context.SaveChangesAsync();
@@ -170,15 +143,15 @@ namespace ERP_API.Services
                     var curriculum = new Curriculum
                     {
                         IdEmployeeFk = employeeId, // Asignar la FK del empleado
-                        PathFileCurriculum = employeeDto.CurriculumDto.PathFileCurriculum,
-                        DateUploaded = employeeDto.CurriculumDto.DateUpload
+                        PathFileCurriculum = ReqEmployeeDto?.CurriculumDto?.PathFileCurriculum,
+                        DateUploaded = ReqEmployeeDto?.CurriculumDto?.DateUpload
                     };
 
                     _context.Curriculum.Add(curriculum);
                     await _context.SaveChangesAsync();
 
                     // Devolver el éxito con el ID del empleado registrado y envia el correo con tu contraseña.
-                    await _emailSend.SendEmailAsync(employeeDto.PersonDto.Email, "Bienvenido a la empresa", "Tu password será:  " + ramdomPaswword +" /n Te recomendamos cambiarla");
+                    await _emailSend.SendEmailAsync(ReqEmployeeDto.PersonDto.EmailPerson , "Bienvenido a la empresa", "Tu password será:  " + ramdomPaswword +" /n Te recomendamos cambiarla");
 
                     // 6. Confirmar la transacción
                     await transaction.CommitAsync();
