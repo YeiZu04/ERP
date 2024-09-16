@@ -26,7 +26,7 @@ bin/
 *.assets.cache
 
 *.AssemblyReference.cache
-ERP-API/obj/Debug/net7.0/ERP-API.GeneratedMSBuildEditorConfig.editorconfig
+ERP-API/obj/Debug/net7.0
 
 **/Debug/net7.0/
 
