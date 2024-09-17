@@ -14,72 +14,101 @@ namespace ERP_API.Services
         private readonly ERPDbContext _context;
 
         private readonly IMapper _mapper;
-        public PersonService( ERPDbContext eRPDbContext, IMapper mapper) { 
+
+        private readonly BearerCode _bearerCode;
+        public PersonService( ERPDbContext eRPDbContext, IMapper mapper, BearerCode bearerCode) { 
 
             _context = eRPDbContext;
             _mapper = mapper;
-        
+            _bearerCode = bearerCode;
         }
 
 
-        public async Task<Api_Response.ApiResponse<string>> UpdatePerson(PersonDto personDto)
+        public async Task<ApiResponse<ResPersonDto>> UpdatePerson(ResPersonDto resPersonDto)
         {
             try
             {
-                var companyId = await GetCompanyIdByCodeAsync(personDto.CompanyCode);
+                var responseJWT = await _bearerCode.VerficationCode();
+                if (responseJWT.Success == false)
+                {
+                    return new ApiResponse<ResPersonDto>
+                    {
+                        Success = false,
+                        ErrorCode = responseJWT.ErrorCode,
+                        ErrorMessage = responseJWT.ErrorMessage
+                    };
+                }
+
+                var Company = responseJWT.Data.IdUserFkNavigation?.IdPersonFkNavigation?.IdCompanyFkNavigation;
                 // Buscar la persona existente en la base de datos
-                var person = await _context.Person.SingleOrDefaultAsync(p => p.PersonUUID == personDto.UUID && p.IdCompanyFk == companyId);
+                var person = await _context.Person.AsNoTracking().FirstOrDefaultAsync(p => p.PersonUUID == resPersonDto.PersonUUID && p.IdCompanyFk == Company.IdCompany);
 
                 // Verificar si la persona existe
                 if (person == null)
                 {
-                    return new Api_Response.ApiResponse<string>
+                    return new ApiResponse<ResPersonDto>
                     {
                         Success = false,
-                        ErrorCode = Api_Response.ErrorCode.NotFound,
+                        ErrorCode = ErrorCode.NotFound,
                         ErrorMessage = "Persona no encontrada."
                     };
                 }
 
                 // Mapear los datos del DTO al objeto Person
-                _mapper.Map(personDto, person);
+                var newPerson= _mapper.Map<Person>(resPersonDto);
+                newPerson.IdPerson = person.IdPerson;
+                newPerson.IdCompanyFk = Company.IdCompany;
+                newPerson.StatePerson = 1;
 
-                _context.Person.Update(person);
+                _context.Person.Update(newPerson);
                 await _context.SaveChangesAsync();
 
                 // Retornar respuesta exitosa
-                return new Api_Response.ApiResponse<string>
+                return new ApiResponse<ResPersonDto>
                 {
                     Success = true,
-                    Data = "Actualización de persona exitosa"
+                    Data = _mapper.Map<ResPersonDto>(newPerson)
                 };
             }
             catch (Exception ex)
             {
                 // Manejo de errores
-                return new Api_Response.ApiResponse<string>
+                return new ApiResponse<ResPersonDto>
                 {
                     Success = false,
-                    ErrorCode = Api_Response.ErrorCode.GeneralError,
+                    ErrorCode = ErrorCode.GeneralError,
                     ErrorMessage = $"Ocurrió un error durante la actualización: {ex.Message}"
                 };
             }
         }
 
-        public async Task<Api_Response.ApiResponse<List<PersonDto>>> ListPerson(int idCompany)
+        public async Task<ApiResponse<List<ResPersonDto>>> ListPerson()
         {
             try
             {
+                var responseJWT = await _bearerCode.VerficationCode();
+                if (responseJWT.Success == false)
+                {
+                    return new ApiResponse<List<ResPersonDto>>
+                    {
+                        Success = false,
+                        ErrorCode = responseJWT.ErrorCode,
+                        ErrorMessage = responseJWT.ErrorMessage
+                    };
+                }
+
+                var companyId = responseJWT.Data.IdUserFkNavigation?.IdPersonFkNavigation?.IdCompanyFkNavigation;
+
                 // Obtén la lista de personas desde la base de datos
                 var people = await _context.Person
-                    .Where(p => p.IdCompanyFk == idCompany && p.StatePerson == 1) 
+                    .Where(p => p.IdCompanyFk == companyId.IdCompany && p.StatePerson == 1) 
                     .ToListAsync();
 
                 // Mapea la lista de entidades Person a PersonDto
-                var ListPerson = _mapper.Map<List<PersonDto>>(people);
+                var ListPerson = _mapper.Map<List<ResPersonDto>>(people);
 
                 // Retorna una respuesta con éxito y la lista de PersonDto
-                return new Api_Response.ApiResponse<List<PersonDto>>
+                return new ApiResponse<List<ResPersonDto>>
                 {
                     Success = true,
                     Data = ListPerson
@@ -88,31 +117,44 @@ namespace ERP_API.Services
             catch (Exception ex)
             {
                 // Retorna una respuesta de error en caso de excepción
-                return new Api_Response.ApiResponse<List<PersonDto>>
+                return new ApiResponse<List<ResPersonDto>>
                 {
                     Success = false,
-                    ErrorCode = Api_Response.ErrorCode.GeneralError,
+                    ErrorCode = ErrorCode.GeneralError,
                     ErrorMessage = $"Ocurrió un error durante la obtención de la lista de personas: {ex.Message}"
                 };
             }
         }
 
 
-        public async Task<Api_Response.ApiResponse<string>> DeletePerson(PersonDto personDto)
+        public async Task<ApiResponse<string>> DeletePerson(ResPersonDto resPersonDto)
         {
             try
             {
-                var companyId = await GetCompanyIdByCodeAsync(personDto.CompanyCode);
-                // Obtén la lista de personas desde la base de datos
-                var person = await _context.Person.SingleOrDefaultAsync(p => p.PersonUUID == personDto.UUID && p.IdCompanyFk == companyId);
 
-                // Mapear los datos del DTO al objeto Person
-                _mapper.Map(personDto, person);
+                var responseJWT = await _bearerCode.VerficationCode();
+                if (responseJWT.Success == false)
+                {
+                    return new ApiResponse<string>
+                    {
+                        Success = false,
+                        ErrorCode = responseJWT.ErrorCode,
+                        ErrorMessage = responseJWT.ErrorMessage
+                    };
+                }
+
+                var Company = responseJWT.Data.IdUserFkNavigation?.IdPersonFkNavigation?.IdCompanyFkNavigation;
+               
+                // Obtén la lista de personas desde la base de datos
+                var person = await _context.Person.FirstOrDefaultAsync(p => p.PersonUUID == resPersonDto.PersonUUID && p.IdCompanyFk == Company.IdCompany);
+
+                // se coloca el estado de la persona en 0 para que no este activa.
+                person.StatePerson = 0;
 
                 _context.Person.Update(person);
                 await _context.SaveChangesAsync();
                 // Retorna una respuesta con éxito y la lista de PersonDto
-                return new Api_Response.ApiResponse<string>
+                return new ApiResponse<string>
                 {
                     Success = true,
                     Data = "Se elimino la persona "
@@ -121,10 +163,10 @@ namespace ERP_API.Services
             catch (Exception ex)
             {
                 // Retorna una respuesta de error en caso de excepción
-                return new Api_Response.ApiResponse<string>
+                return new ApiResponse<string>
                 {
                     Success = false,
-                    ErrorCode = Api_Response.ErrorCode.GeneralError,
+                    ErrorCode = ErrorCode.GeneralError,
                     ErrorMessage = $"Ocurrió un error durante la obtención de la lista de personas: {ex.Message}"
                 };
             }

@@ -14,11 +14,11 @@ public class PersonController : ControllerBase
         _personService = personService;
     }
 
-    // GET: api/Person/list/{companyId}
-    [HttpGet("list/{companyId}")]
-    public async Task<IActionResult> ListPerson(int companyId)
+    // GET: api/Person/list/
+    [HttpGet("list")]
+    public async Task<IActionResult> ListPerson()
     {
-        var result = await _personService.ListPerson(companyId);
+        var result = await _personService.ListPerson();
 
         if (result.Success)
         {
@@ -41,9 +41,9 @@ public class PersonController : ControllerBase
 
     // PUT: api/Person/update
     [HttpPut("update")]
-    public async Task<IActionResult> UpdatePerson([FromBody] PersonDto personDto)
+    public async Task<IActionResult> UpdatePerson([FromBody] ResPersonDto resPersonDto)
     {
-        var result = await _personService.UpdatePerson(personDto);
+        var result = await _personService.UpdatePerson(resPersonDto);
 
         if (result.Success)
         {
@@ -65,9 +65,9 @@ public class PersonController : ControllerBase
 
     // DELETE: api/Person/delete
     [HttpDelete("delete")]
-    public async Task<IActionResult> DeletePerson([FromBody] PersonDto personDto)
+    public async Task<IActionResult> DeletePerson([FromBody] ResPersonDto resPersonDto)
     {
-        var result = await _personService.DeletePerson(personDto);
+        var result = await _personService.DeletePerson(resPersonDto);
 
         if (result.Success)
         {

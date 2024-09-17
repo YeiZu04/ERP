@@ -1,8 +1,7 @@
 ﻿using ERP_API.DTOs;
 using ERP_API.Services;
-using ERP_API.Services.Tools;
 using Microsoft.AspNetCore.Mvc;
-
+using ERP_API.Services.Tools;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -17,7 +16,7 @@ public class EmployeeController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> RegisterEmployee([FromBody] RegisterEmployee employeeDto)
+    public async Task<IActionResult> RegisterEmployee([FromBody] ReqEmployeeDto employeeDto)
     {
         // Llama al servicio para registrar al empleado
         var result = await _employeeService.RegisterEmployeeAsync(employeeDto);
@@ -25,7 +24,7 @@ public class EmployeeController : ControllerBase
         // Verifica si la operación fue exitosa
         if (result.Success)
         {
-            // Devuelve una respuesta 200 OK 
+            // Devuelve una respuesta 200 OK con el ID del empleado registrado
             return Ok(new
             {
                 message = "Empleado registrado exitosamente",

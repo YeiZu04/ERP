@@ -1,10 +1,8 @@
 ﻿namespace ERP_API.DTOs
 {
-    public class RegisterEmployee
+    public class ReqEmployeeDto
     {
-        public PersonDto? PersonDto { get; set; }
-
-        public string? JwtToken { get; set; }
+        public ReqPersonDto? PersonDto { get; set; }
         public UserDto? UserDto { get; set; }
         public EmployeeDto? EmployeeDto { get; set; }
         public UserRoleDto? UserRoleDto { get; set; }

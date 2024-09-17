@@ -9,9 +9,9 @@ namespace ERP_API.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly ILogginService _authService;
+        private readonly LoginService _authService;
 
-        public AuthController(ILogginService authService)
+        public AuthController(LoginService authService)
         {
             _authService = authService;
         }

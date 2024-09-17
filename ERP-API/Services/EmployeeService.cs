@@ -34,7 +34,7 @@ namespace ERP_API.Services
             
         }
         
-        public async Task<Api_Response.ApiResponse <string>> RegisterEmployeeAsync(RegisterEmployee ReqEmployeeDto)
+        public async Task<Api_Response.ApiResponse <string>> RegisterEmployeeAsync(ReqEmployeeDto ReqEmployeeDto)
         {
 
 
@@ -44,7 +44,7 @@ namespace ERP_API.Services
                 try
                 {
 
-                    var responseJWT = await _bearerCode.VerficationCode(ReqEmployeeDto.JwtToken);
+                    var responseJWT = await _bearerCode.VerficationCode();
                     if (responseJWT.Success == false)
                     {
                         return new Api_Response.ApiResponse<string>
@@ -55,13 +55,18 @@ namespace ERP_API.Services
                         };
                     }
 
-                    var session = await _context.Sessions
-                      .Include(s => s.IdUserFkNavigation) // Relación con User
-                          .ThenInclude(u => u.IdPersonFkNavigation) // Relación con Person
-                          .ThenInclude(p => p.IdCompanyFkNavigation) // Relación con Company
-                      .FirstOrDefaultAsync(s => s.TokenSession == ReqEmployeeDto.JwtToken); // Filtrar por el token JWT
+                    var Company = responseJWT.Data.IdUserFkNavigation?.IdPersonFkNavigation?.IdCompanyFkNavigation;
 
-                    var companyId = session?.IdUserFkNavigation?.IdPersonFkNavigation?.IdCompanyFkNavigation;
+                    Console.WriteLine(Company);
+                    if ( await UserExistsByUserName(ReqEmployeeDto.UserDto.UserName, Company.IdCompany))
+                    {
+                        return new Api_Response.ApiResponse<string>
+                        {
+                            Success = false,
+                            ErrorCode = Api_Response.ErrorCode.UserAlreadyExists,
+                            ErrorMessage = "El userName ya esta registrado"
+                        };
+                    }
 
                     /*
                     // verificar si el correo propocionado existe en algun SmtpClient
@@ -77,8 +82,8 @@ namespace ERP_API.Services
                     */
 
                     // Verificar si el correo (usuario) ya existe en la empresa 
-                    Console.WriteLine(companyId);
-                    if (await UserExistsByEmail(ReqEmployeeDto?.PersonDto?.EmailPerson, companyId.IdCompany))
+                    
+                    if (await UserExistsByEmail(ReqEmployeeDto?.PersonDto?.EmailPerson, Company.IdCompany))
                     {
                         return new Api_Response.ApiResponse<string>
                         {
@@ -90,8 +95,9 @@ namespace ERP_API.Services
 
                     // 1. Registrar la Persona
                     var person = _Mapper.Map<Person>(ReqEmployeeDto?.PersonDto);
-                    person.IdCompanyFk = companyId.IdCompany;
+                    person.IdCompanyFk = Company.IdCompany;
                     person.PersonUUID =  Guid.NewGuid();
+                    person.StatePerson = 1;
 
                     _context.Person.Add(person);
                     await _context.SaveChangesAsync();
@@ -180,18 +186,23 @@ namespace ERP_API.Services
             }
         }
 
-        private async Task<int?> GetCompanyIdByCodeAsync(string companyCode)
-        {
-            var company = await _context.Companies
-                                        .FirstOrDefaultAsync(c => c.CodeCompany == companyCode);
-            return company?.IdCompany;
-        }
+      
 
         private async Task<bool> UserExistsByEmail(string email, int companyId)
         {
             return await _context.Person
                 .AnyAsync(u => u.EmailPerson == email && u.IdCompanyFk == companyId);
         }
+
+        private async Task<bool> UserExistsByUserName(string userName, int idCompany)
+        {
+
+
+            // Verificar si el nombre de usuario ya existe en la compañía
+            return await _context.Users
+                .AnyAsync(u => u.NameUser == userName && u.IdPersonFkNavigation.IdCompanyFk == idCompany);
+        }
+
 
     }
 }

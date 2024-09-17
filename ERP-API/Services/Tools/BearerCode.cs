@@ -17,7 +17,7 @@ namespace ERP_API.Services.Tools
 
 
 
-        public async Task<Api_Response.ApiResponse<Session>> VerficationCode(string code)
+        public async Task<Api_Response.ApiResponse<Session>> VerficationCode()
         {
             try
             {
@@ -32,7 +32,12 @@ namespace ERP_API.Services.Tools
                         ErrorMessage = "Código JWT no encontrado."
                     };
 
-                var session = await _Dbcontext.Sessions.FirstOrDefaultAsync(s => s.TokenSession == token);
+                var session = await _Dbcontext.Sessions
+                    .Include(s => s.IdUserFkNavigation)         // Incluir la navegación hacia User
+                    .ThenInclude(u => u.IdPersonFkNavigation)   // Incluir la navegación hacia Person
+                    .ThenInclude(p => p.IdCompanyFkNavigation)  // Incluir la navegación hacia Company
+                    .FirstOrDefaultAsync(s => s.TokenSession == token);
+
 
                 if (session == null)
                 {

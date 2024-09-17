@@ -31,7 +31,7 @@ public partial class Person
     public int? IdCompanyFk { get; set; }
 
     [Column("UUID_person")]
-    public Guid PersonUUID { get; set; } // Mapeo de la columna UUID_person// Nuevo campo UUID
+    public Guid PersonUUID { get; set; } // Mapeo de la columna UUID_person// Nuevo campo PersonUUID
 
     public virtual ICollection<Candidate> Candidates { get; set; } = new List<Candidate>();
 

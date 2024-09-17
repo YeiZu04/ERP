@@ -9,8 +9,11 @@ namespace ERP_API.Utilities
     {
        public PersonMapperProfile() {
 
-            CreateMap<Person, PersonDto>();
-            CreateMap<PersonDto , Person>();
+            CreateMap<Person, ReqPersonDto>();
+            CreateMap<ReqPersonDto , Person>();
+
+            CreateMap<Person, ResPersonDto>();
+            CreateMap<ResPersonDto, Person>();
         }
     }
 }
