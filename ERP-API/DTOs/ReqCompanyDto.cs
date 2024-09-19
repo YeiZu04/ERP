@@ -4,11 +4,14 @@ namespace ERP_API.DTOs
 {
     public class ReqCompanyDto
     {
-        [Required]
+        //id de la compañia
+        public int IdCompany { get; set; }
+
+     
         [StringLength(100)]
         public string NameCompany { get; set; }
 
-        [Required]
+        
         [StringLength(100)]
         public string CodeCompany { get; set; }
 
