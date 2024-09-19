@@ -37,6 +37,8 @@ builder.Services.AddScoped<PasswordHash>();
 builder.Services.AddScoped<SendEmail>();
 builder.Services.AddScoped<RandomGenerator>();
 builder.Services.AddScoped<Api_Response>();
+builder.Services.AddScoped<CompanyService>();
+builder.Services.AddScoped<PermissionService>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
