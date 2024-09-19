@@ -21,15 +21,22 @@ public class CompanyController : ControllerBase
     [HttpGet("list")]
     public async Task<IActionResult> ListCompanies()
     {
-        var result = await _companyService.ListCompanies();
+        var response = await _companyService.ListCompanies();
 
-        if (result.Success)
+        if (response.Success)
         {
-            return Ok(new { message = "Lista de compañías obtenida exitosamente", companies = result.Data });
+            return Ok(response);
         }
         else
         {
-            return StatusCode(500, new { message = result.ErrorMessage });
+            return response.ErrorCode switch
+            {
+                Api_Response.ErrorCode.UserAlreadyExists => Conflict(new { message = response.ErrorMessage }),
+                Api_Response.ErrorCode.InvalidInput => BadRequest(new { message = response.ErrorMessage }),
+                Api_Response.ErrorCode.NotFound => NotFound(new { message = response.ErrorMessage }),
+                Api_Response.ErrorCode.errorDataBase => StatusCode(500, new { message = response.ErrorMessage }),
+                _ => StatusCode(500, new { message = response.ErrorMessage })
+            };
         }
     }
 
@@ -38,15 +45,22 @@ public class CompanyController : ControllerBase
     [HttpPost("create")]
     public async Task<IActionResult> CreateCompany([FromBody] ReqCompanyDto reqCompanyDto)
     {
-        var result = await _companyService.CreateCompany(reqCompanyDto);
+        var response = await _companyService.CreateCompany(reqCompanyDto);
 
-        if (result.Success)
+        if (response.Success)
         {
-            return Ok(new { message = "Compañía creada exitosamente", company = result.Data });
+            return Ok(response);
         }
         else
         {
-            return StatusCode(500, new { message = result.ErrorMessage });
+            return response.ErrorCode switch
+            {
+                Api_Response.ErrorCode.UserAlreadyExists => Conflict(new { message = response.ErrorMessage }),
+                Api_Response.ErrorCode.InvalidInput => BadRequest(new { message = response.ErrorMessage }),
+                Api_Response.ErrorCode.NotFound => NotFound(new { message = response.ErrorMessage }),
+                Api_Response.ErrorCode.errorDataBase => StatusCode(500, new { message = response.ErrorMessage }),
+                _ => StatusCode(500, new { message = response.ErrorMessage })
+            };
         }
     }
 
@@ -54,19 +68,21 @@ public class CompanyController : ControllerBase
     [HttpPut("update")]
     public async Task<IActionResult> UpdateCompany( [FromBody] ReqCompanyDto reqCompanyDto)
     {
-        var result = await _companyService.UpdateCompany( reqCompanyDto);
+        var response = await _companyService.UpdateCompany( reqCompanyDto);
 
-        if (result.Success)
+        if (response.Success)
         {
-            return Ok(new { message = "Compañía actualizada exitosamente", company = result.Data });
-        }
-        else if (result.ErrorCode == ErrorCode.NotFound)
+            return Ok(response);
+        }else
         {
-            return NotFound(new { message = result.ErrorMessage });
-        }
-        else
-        {
-            return StatusCode(500, new { message = result.ErrorMessage });
+            return response.ErrorCode switch
+            {
+                Api_Response.ErrorCode.UserAlreadyExists => Conflict(new { message = response.ErrorMessage }),
+                Api_Response.ErrorCode.InvalidInput => BadRequest(new { message = response.ErrorMessage }),
+                Api_Response.ErrorCode.NotFound => NotFound(new { message = response.ErrorMessage }),
+                Api_Response.ErrorCode.errorDataBase => StatusCode(500, new { message = response.ErrorMessage }),
+                _ => StatusCode(500, new { message = response.ErrorMessage })
+            };
         }
     }
 
@@ -74,19 +90,21 @@ public class CompanyController : ControllerBase
     [HttpDelete("delete")]
     public async Task<IActionResult> DeleteCompany([FromBody] ReqCompanyDto reqCompanyDto)
     {
-        var result = await _companyService.DeleteCompany(reqCompanyDto);
+        var response = await _companyService.DeleteCompany(reqCompanyDto);
 
-        if (result.Success)
+        if (response.Success)
         {
-            return Ok(new { message = result.Data });
-        }
-        else if (result.ErrorCode == ErrorCode.NotFound)
+            return Ok( response);
+        }else
         {
-            return NotFound(new { message = result.ErrorMessage });
-        }
-        else
-        {
-            return StatusCode(500, new { message = result.ErrorMessage });
+            return response.ErrorCode switch
+            {
+                Api_Response.ErrorCode.UserAlreadyExists => Conflict(new { message = response.ErrorMessage }),
+                Api_Response.ErrorCode.InvalidInput => BadRequest(new { message = response.ErrorMessage }),
+                Api_Response.ErrorCode.NotFound => NotFound(new { message = response.ErrorMessage }),
+                Api_Response.ErrorCode.errorDataBase => StatusCode(500, new { message = response.ErrorMessage }),
+                _ => StatusCode(500, new { message = response.ErrorMessage })
+            };
         }
     }
 }

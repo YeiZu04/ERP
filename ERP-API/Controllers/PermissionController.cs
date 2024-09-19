@@ -19,15 +19,22 @@ public class PermissionController : ControllerBase
     [HttpPost("create")]
     public async Task<IActionResult> CreatePermission([FromBody] ReqPermissionDto reqPermissionDto)
     {
-        var result = await _permissionService.CreatePermission(reqPermissionDto);
+        var response = await _permissionService.CreatePermission(reqPermissionDto);
 
-        if (result.Success)
+        if (response.Success)
         {
-            return Ok(new { message = "Permiso creado exitosamente", permission = result.Data });
+            return Ok(response);
         }
         else
         {
-            return StatusCode(500, new { message = result.ErrorMessage });
+            return response.ErrorCode switch
+            {
+                Api_Response.ErrorCode.UserAlreadyExists => Conflict(new { message = response.ErrorMessage }),
+                Api_Response.ErrorCode.InvalidInput => BadRequest(new { message = response.ErrorMessage }),
+                Api_Response.ErrorCode.NotFound => NotFound(new { message = response.ErrorMessage }),
+                Api_Response.ErrorCode.errorDataBase => StatusCode(500, new { message = response.ErrorMessage }),
+                _ => StatusCode(500, new { message = response.ErrorMessage })
+            };
         }
     }
 
@@ -35,15 +42,22 @@ public class PermissionController : ControllerBase
     [HttpGet("list")]
     public async Task<IActionResult> ListPermissions()
     {
-        var result = await _permissionService.ListPermissions();
+        var response = await _permissionService.ListPermissions();
 
-        if (result.Success)
+        if (response.Success)
         {
-            return Ok(new { message = "Lista de permisos obtenida exitosamente", permissions = result.Data });
+            return Ok(response);
         }
         else
         {
-            return StatusCode(500, new { message = result.ErrorMessage });
+            return response.ErrorCode switch
+            {
+                Api_Response.ErrorCode.UserAlreadyExists => Conflict(new { message = response.ErrorMessage }),
+                Api_Response.ErrorCode.InvalidInput => BadRequest(new { message = response.ErrorMessage }),
+                Api_Response.ErrorCode.NotFound => NotFound(new { message = response.ErrorMessage }),
+                Api_Response.ErrorCode.errorDataBase => StatusCode(500, new { message = response.ErrorMessage }),
+                _ => StatusCode(500, new { message = response.ErrorMessage })
+            };
         }
     }
 
@@ -51,15 +65,22 @@ public class PermissionController : ControllerBase
     [HttpPut("update")]
     public async Task<IActionResult> UpdatePermission( [FromBody] ReqPermissionDto reqPermissionDto)
     {
-        var result = await _permissionService.UpdatePermission( reqPermissionDto);
+        var response = await _permissionService.UpdatePermission( reqPermissionDto);
 
-        if (result.Success)
+        if (response.Success)
         {
-            return Ok(new { message = "Permiso actualizado exitosamente", permission = result.Data });
+            return Ok( response);
         }
         else
         {
-            return StatusCode(500, new { message = result.ErrorMessage });
+            return response.ErrorCode switch
+            {
+                Api_Response.ErrorCode.UserAlreadyExists => Conflict(new { message = response.ErrorMessage }),
+                Api_Response.ErrorCode.InvalidInput => BadRequest(new { message = response.ErrorMessage }),
+                Api_Response.ErrorCode.NotFound => NotFound(new { message = response.ErrorMessage }),
+                Api_Response.ErrorCode.errorDataBase => StatusCode(500, new { message = response.ErrorMessage }),
+                _ => StatusCode(500, new { message = response.ErrorMessage })
+            };
         }
     }
 
@@ -67,15 +88,22 @@ public class PermissionController : ControllerBase
     [HttpDelete("delete")]
     public async Task<IActionResult> DeletePermission([FromBody] ReqPermissionDto reqPermissionDto)
     {
-        var result = await _permissionService.DeletePermission(reqPermissionDto);
+        var response = await _permissionService.DeletePermission(reqPermissionDto);
 
-        if (result.Success)
+        if (response.Success)
         {
-            return Ok(new { message = "Permiso eliminado exitosamente" });
+            return Ok(response);
         }
         else
         {
-            return StatusCode(500, new { message = result.ErrorMessage });
+            return response.ErrorCode switch
+            {
+                Api_Response.ErrorCode.UserAlreadyExists => Conflict(new { message = response.ErrorMessage }),
+                Api_Response.ErrorCode.InvalidInput => BadRequest(new { message = response.ErrorMessage }),
+                Api_Response.ErrorCode.NotFound => NotFound(new { message = response.ErrorMessage }),
+                Api_Response.ErrorCode.errorDataBase => StatusCode(500, new { message = response.ErrorMessage }),
+                _ => StatusCode(500, new { message = response.ErrorMessage })
+            };
         }
     }
 }
