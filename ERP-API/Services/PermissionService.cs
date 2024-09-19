@@ -2,6 +2,7 @@
 using ERP_API.DTOs;
 using ERP_API.Models;
 using ERP_API.Services.Tools;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -95,7 +96,7 @@ namespace ERP_API.Services
         }
 
         // Método para actualizar un permiso
-        public async Task<ApiResponse<ResPermissionDto>> UpdatePermission(int id, ReqPermissionDto reqPermissionDto)
+        public async Task<ApiResponse<ResPermissionDto>> UpdatePermission( ReqPermissionDto reqPermissionDto)
         {
             try
             {
@@ -109,7 +110,7 @@ namespace ERP_API.Services
                         ErrorMessage = responseJWT.ErrorMessage
                     };
                 }
-                var permission = await _context.Permissions.FirstOrDefaultAsync(p => p.IdPermission == id);
+                var permission = await _context.Permissions.FirstOrDefaultAsync(p => p.IdPermission == reqPermissionDto.IdPermission);
                 if (permission == null)
                 {
                     return new ApiResponse<ResPermissionDto>
@@ -142,21 +143,21 @@ namespace ERP_API.Services
         }
 
         // Método para eliminar un permiso
-        public async Task<ApiResponse<string>> DeletePermission(int id)
+        public async Task<ApiResponse<string>> DeletePermission(ReqPermissionDto reqPermissionDto)
         {
             try
             {
                 var responseJWT = await _bearerCode.VerficationCode();
                 if (responseJWT.Success == false)
                 {
-                    return  new ApiResponse<string>
+                    return new ApiResponse<string>
                     {
                         Success = false,
                         ErrorCode = responseJWT.ErrorCode,
                         ErrorMessage = responseJWT.ErrorMessage
                     };
                 }
-                var permission = await _context.Permissions.FirstOrDefaultAsync(p => p.IdPermission == id);
+                var permission = await _context.Permissions.FirstOrDefaultAsync(p => p.IdPermission == reqPermissionDto.IdPermission);
                 if (permission == null)
                 {
                     return new ApiResponse<string>

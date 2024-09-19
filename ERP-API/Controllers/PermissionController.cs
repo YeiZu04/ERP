@@ -16,7 +16,7 @@ public class PermissionController : ControllerBase
     }
 
     // POST: api/Permission/create
-    [HttpPost("create")]
+    [HttpPost("Create")]
     public async Task<IActionResult> CreatePermission([FromBody] ReqPermissionDto reqPermissionDto)
     {
         var result = await _permissionService.CreatePermission(reqPermissionDto);
@@ -32,7 +32,7 @@ public class PermissionController : ControllerBase
     }
 
     // GET: api/Permission/list
-    [HttpGet("list")]
+    [HttpGet("List")]
     public async Task<IActionResult> ListPermissions()
     {
         var result = await _permissionService.ListPermissions();
@@ -48,10 +48,10 @@ public class PermissionController : ControllerBase
     }
 
     // PUT: api/Permission/update/{id}
-    [HttpPut("update/{id}")]
-    public async Task<IActionResult> UpdatePermission(int id, [FromBody] ReqPermissionDto reqPermissionDto)
+    [HttpPut("Update")]
+    public async Task<IActionResult> UpdatePermission( [FromBody] ReqPermissionDto reqPermissionDto)
     {
-        var result = await _permissionService.UpdatePermission(id, reqPermissionDto);
+        var result = await _permissionService.UpdatePermission( reqPermissionDto);
 
         if (result.Success)
         {
@@ -64,10 +64,10 @@ public class PermissionController : ControllerBase
     }
 
     // DELETE: api/Permission/delete/{id}
-    [HttpDelete("delete/{id}")]
-    public async Task<IActionResult> DeletePermission(int id)
+    [HttpDelete("Delete")]
+    public async Task<IActionResult> DeletePermission([FromBody] ReqPermissionDto reqPermissionDto)
     {
-        var result = await _permissionService.DeletePermission(id);
+        var result = await _permissionService.DeletePermission(reqPermissionDto);
 
         if (result.Success)
         {
