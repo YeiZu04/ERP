@@ -61,55 +61,8 @@ namespace ERP_API.Services
             }
         }
 
-        // READ
-        public async Task<ApiResponse<ResCompanyDto>> GetCompany(int id)
-        {
-            try
-            {
-                var responseJWT = await _bearerCode.VerficationCode();
-
-                if (responseJWT.Success == false)
-                {
-                    return new ApiResponse<ResCompanyDto>
-                    {
-                        Success = false,
-                        ErrorCode = responseJWT.ErrorCode,
-                        ErrorMessage = responseJWT.ErrorMessage
-                    };
-                }
-
-                var company = await _context.Companies.FindAsync(id);
-                if (company == null)
-                {
-                    return new ApiResponse<ResCompanyDto>
-                    {
-                        Success = false,
-                        ErrorCode = ErrorCode.NotFound,
-                        ErrorMessage = "Compañía no encontrada."
-                    };
-                }
-
-                var resCompanyDto = _mapper.Map<ResCompanyDto>(company);
-
-                return new ApiResponse<ResCompanyDto>
-                {
-                    Success = true,
-                    Data = resCompanyDto
-                };
-            }
-            catch (Exception ex)
-            {
-                return new ApiResponse<ResCompanyDto>
-                {
-                    Success = false,
-                    ErrorCode = ErrorCode.GeneralError,
-                    ErrorMessage = $"Error al obtener la compañía: {ex.Message}"
-                };
-            }
-        }
-
         // UPDATE
-        public async Task<ApiResponse<ResCompanyDto>> UpdateCompany(int id, ReqCompanyDto reqCompanyDto)
+        public async Task<ApiResponse<ResCompanyDto>> UpdateCompany(ReqCompanyDto reqCompanyDto)
         {
             try
             {
@@ -125,7 +78,7 @@ namespace ERP_API.Services
                     };
                 }
 
-                var company = await _context.Companies.FindAsync(id);
+                var company = await _context.Companies.FindAsync(reqCompanyDto.IdCompany);
                 if (company == null)
                 {
                     return new ApiResponse<ResCompanyDto>
@@ -162,7 +115,7 @@ namespace ERP_API.Services
         }
 
         // DELETE (Cambiar estado en lugar de eliminar)
-        public async Task<ApiResponse<string>> DeleteCompany(int id)
+        public async Task<ApiResponse<string>> DeleteCompany(ReqCompanyDto reqCompanyDto)
         {
             try
             {
@@ -178,7 +131,7 @@ namespace ERP_API.Services
                     };
                 }
 
-                var company = await _context.Companies.FindAsync(id);
+                var company = await _context.Companies.FindAsync(reqCompanyDto.IdCompany);
                 if (company == null)
                 {
                     return new ApiResponse<string>

@@ -33,25 +33,6 @@ public class CompanyController : ControllerBase
         }
     }
 
-    // GET: api/Company/{id}
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetCompany(int id)
-    {
-        var result = await _companyService.GetCompany(id);
-
-        if (result.Success)
-        {
-            return Ok(result.Data);
-        }
-        else if (result.ErrorCode == ErrorCode.NotFound)
-        {
-            return NotFound(new { message = result.ErrorMessage });
-        }
-        else
-        {
-            return StatusCode(500, new { message = result.ErrorMessage });
-        }
-    }
 
     // POST: api/Company/create
     [HttpPost("create")]
@@ -70,10 +51,10 @@ public class CompanyController : ControllerBase
     }
 
     // PUT: api/Company/update/{id}
-    [HttpPut("update/{id}")]
-    public async Task<IActionResult> UpdateCompany(int id, [FromBody] ReqCompanyDto reqCompanyDto)
+    [HttpPut("update")]
+    public async Task<IActionResult> UpdateCompany( [FromBody] ReqCompanyDto reqCompanyDto)
     {
-        var result = await _companyService.UpdateCompany(id, reqCompanyDto);
+        var result = await _companyService.UpdateCompany( reqCompanyDto);
 
         if (result.Success)
         {
@@ -89,11 +70,11 @@ public class CompanyController : ControllerBase
         }
     }
 
-    // DELETE: api/Company/delete/{id}
-    [HttpDelete("delete/{id}")]
-    public async Task<IActionResult> DeleteCompany(int id)
+    // DELETE: api/Company/delete
+    [HttpDelete("delete")]
+    public async Task<IActionResult> DeleteCompany([FromBody] ReqCompanyDto reqCompanyDto)
     {
-        var result = await _companyService.DeleteCompany(id);
+        var result = await _companyService.DeleteCompany(reqCompanyDto);
 
         if (result.Success)
         {
