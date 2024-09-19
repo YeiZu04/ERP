@@ -22,11 +22,7 @@ public class PersonController : ControllerBase
 
         if (result.Success)
         {
-            return Ok(new
-            {
-                message = "Lista de personas obtenida exitosamente",
-                people = result.Data
-            });
+            return Ok(result);
         }
         else
         {
@@ -47,10 +43,7 @@ public class PersonController : ControllerBase
 
         if (result.Success)
         {
-            return Ok(new
-            {
-                message = "Persona actualizada exitosamente"
-            });
+            return Ok(result);
         }
         else
         {
@@ -71,10 +64,7 @@ public class PersonController : ControllerBase
 
         if (result.Success)
         {
-            return Ok(new
-            {
-                message = "Persona eliminada exitosamente"
-            });
+            return Ok(result);
         }
         else
         {

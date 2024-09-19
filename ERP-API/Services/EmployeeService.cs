@@ -157,7 +157,7 @@ namespace ERP_API.Services
                     await _context.SaveChangesAsync();
 
                     // Devolver el éxito con el ID del empleado registrado y envia el correo con tu contraseña.
-                    await _emailSend.SendEmailAsync(ReqEmployeeDto.PersonDto.EmailPerson , "Bienvenido a la empresa", "Tu password será:  " + ramdomPaswword +" /n Te recomendamos cambiarla");
+                    await _emailSend.SendEmailAsync(ReqEmployeeDto.PersonDto.EmailPerson , "Bienvenido a la empresa", "Tu password será:  " + ramdomPaswword +" Te recomendamos cambiarla");
 
                     // 6. Confirmar la transacción
                     await transaction.CommitAsync();
@@ -185,6 +185,8 @@ namespace ERP_API.Services
                 }
             }
         }
+
+      
 
       
 

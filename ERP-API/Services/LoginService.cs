@@ -14,19 +14,21 @@ namespace ERP_API.Services
 
     public class LoginService 
     {
-        private readonly ERPDbContext _context;
-        private readonly IConfiguration _configuration;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ERPDbContext _context;      
         private readonly BearerCode _bearerCode;
+        private readonly IConfiguration _configuration;
         private readonly PasswordHash _passwordHash;
+        private readonly RandomGenerator _randomGenerator;
+        private readonly SendEmail _emailSend;
 
-        public LoginService(ERPDbContext context, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, BearerCode bearerCode, PasswordHash passwordHash )
+        public LoginService(ERPDbContext context, SendEmail sendEmail,IConfiguration configuration, RandomGenerator randomGenerator, BearerCode bearerCode, PasswordHash passwordHash )
         {
             _context = context;
-            _configuration = configuration;
-            _httpContextAccessor = httpContextAccessor;
             _bearerCode = bearerCode;
             _passwordHash = passwordHash;
+            _randomGenerator = randomGenerator;
+            _configuration = configuration;
+            _emailSend = sendEmail;
         }
 
         public async Task<Api_Response.ApiResponse<string>> Authenticate(LoginDto loginDto)
@@ -51,7 +53,7 @@ namespace ERP_API.Services
                         ErrorCode = Api_Response.ErrorCode.InvalidInput,
                         ErrorMessage = "Contraseña o usuario incorrectos "
                     };
-                 }
+                }
 
                 // Verificamos si el estado de la persona es inactivo
                 if (user.IdPersonFkNavigation.StatePerson != 1)
@@ -89,7 +91,7 @@ namespace ERP_API.Services
 
                 _context.Sessions.Add(session);
                 await _context.SaveChangesAsync();
-
+                
                 return new Api_Response.ApiResponse<string>
                 {
                     Success = true,
@@ -98,22 +100,22 @@ namespace ERP_API.Services
 
 
             }
-        catch (Exception ex)
-        {
-            return new Api_Response.ApiResponse<string>
+            catch (Exception ex)
             {
-                Success = false,
-                ErrorCode = Api_Response.ErrorCode.GeneralError,
-                ErrorMessage = ex.Message
-            };
+                return new Api_Response.ApiResponse<string>
+                {
+                    Success = false,
+                    ErrorCode = Api_Response.ErrorCode.GeneralError,
+                    ErrorMessage = ex.Message
+                };
 
+            }
         }
-    }
 
         public async Task<Api_Response.ApiResponse<string>> Logout()
         {
             var responseJWT = await _bearerCode.VerficationCode();
-            if (responseJWT.Success == true)
+            if (responseJWT.Success)
             {
                 _context.Sessions.Remove(responseJWT.Data);
                 await _context.SaveChangesAsync();
@@ -133,10 +135,126 @@ namespace ERP_API.Services
                 };
 
             }
-
-
         }
 
+        public async Task<Api_Response.ApiResponse<string>> RecoveryPassword(RecoveryPasswordDto recoveryPasswordDto)
+        {
+            try
+            {
+
+
+                var user = await _context.Users
+                .Include(u => u.IdPersonFkNavigation) // Incluye la relación con la tabla Person
+                .ThenInclude(p => p.IdCompanyFkNavigation) // Luego incluye la relación con la tabla Company
+                .FirstOrDefaultAsync(u =>
+                    u.NameUser == recoveryPasswordDto.UserName && // Filtro por nombre de usuario
+                    u.IdPersonFkNavigation.IdentificationPerson == recoveryPasswordDto.IdentificationPerson && // Filtro por identificación de la persona
+                    u.IdPersonFkNavigation.EmailPerson == recoveryPasswordDto.Email && // Filtro por email de la persona
+                    u.IdPersonFkNavigation.IdCompanyFkNavigation.CodeCompany == recoveryPasswordDto.CodeCompany); // Filtro por código de la empresa
+
+                if (user == null)
+                {
+                    return new Api_Response.ApiResponse<string>
+                    {
+                        Success = false,
+                        ErrorCode = Api_Response.ErrorCode.NotFound,
+                        ErrorMessage = "Los datos no coinciden con algun usuario "
+                    };
+                }
+
+                // 2. Registrar el Usuario
+                var ramdomPaswword = _randomGenerator.GenerateRandomPassword();
+                var newPassword = _passwordHash.HashPassword(ramdomPaswword);
+                user.PasswordUser = newPassword;
+
+                _context.Users.Update(user);
+                await _context.SaveChangesAsync();
+                await _emailSend.SendEmailAsync(recoveryPasswordDto.Email, "Se ha cambiado tu contraseña", "Tu password será:  " + ramdomPaswword + " Te recomendamos cambiarla");
+                return new Api_Response.ApiResponse<string>
+                {
+                    Success = true,
+                    Data = "Tu nueva contraña fue enviada a tu correo"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new Api_Response.ApiResponse<string>
+                {
+                    Success = false,
+                    ErrorCode = Api_Response.ErrorCode.GeneralError,
+                    ErrorMessage = "Error al recuperar contraseña:" + ex.Message
+                };
+            }
+        }
+        public async Task<Api_Response.ApiResponse<string>> ChangePassword(ChangePasswordDto changePassword)
+        {
+
+            try
+            {
+
+                var responseJWT = await _bearerCode.VerficationCode();
+                if (responseJWT.Success == false)
+                {
+                    return new Api_Response.ApiResponse<string>
+                    {
+                        Success = false,
+                        ErrorCode = responseJWT.ErrorCode,
+                        ErrorMessage = responseJWT.ErrorMessage
+                    };
+                }
+                var user = await _context.Users
+                .FirstOrDefaultAsync(u =>
+                u.IdUser == responseJWT.Data.IdUserFk);
+
+                if (user == null && _passwordHash.VerifyPassword(user.PasswordUser, changePassword.Password))
+                {
+                    return new Api_Response.ApiResponse<string>
+                    {
+                        Success = false,
+                        ErrorCode = Api_Response.ErrorCode.InvalidInput,
+                        ErrorMessage = "Contraseña  incorrecta "
+                    };
+                }
+
+
+                var newPassword = _passwordHash.HashPassword(changePassword.NewPassword);
+                user.PasswordUser = newPassword;
+
+                _context.Users.Update(user);
+                await _context.SaveChangesAsync();
+                await CloseExistingSessionAsync(user.IdUser);
+                return new Api_Response.ApiResponse<string>
+                {
+                    Success = true,
+                    Data = "Tu contraseña ha sido cambiada"
+                };
+
+            }
+
+            catch (Exception ex)
+            {
+                return new Api_Response.ApiResponse<string>
+                {
+                    Success = false,
+                    ErrorCode = Api_Response.ErrorCode.GeneralError,
+                    ErrorMessage = "Error al cambio de contraseña:" + ex.Message
+                };
+
+            }
+           
+        }
+
+        private async Task CloseExistingSessionAsync(int userId)
+        {
+            var existingSession = await _context.Sessions
+                .FirstOrDefaultAsync(s => s.IdUserFk == userId);
+
+            if (existingSession != null)
+            {
+                _context.Sessions.Remove(existingSession);
+                await _context.SaveChangesAsync();
+            }
+        }
 
         public string tokenStruct(List<Claim> claims, DateTime expire)
         {
