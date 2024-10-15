@@ -19,7 +19,7 @@ public class EmployeeController : ControllerBase
     public async Task<IActionResult> RegisterEmployee([FromBody] ReqEmployeeDto employeeDto)
     {
         // Llama al servicio para registrar al empleado
-        var response = await _employeeService.RegisterEmployeeAsync(employeeDto);
+        var response = await _employeeService.RegisterEmployee(employeeDto);
 
         // Verifica si la operación fue exitosa
         if (response.Success)

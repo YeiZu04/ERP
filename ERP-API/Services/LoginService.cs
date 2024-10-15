@@ -1,4 +1,5 @@
 ﻿using ERP_API.DTOs;
+using ERP_API.Interfaces;
 using ERP_API.Models;
 using ERP_API.Services.Tools;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +13,7 @@ namespace ERP_API.Services
 {
     
 
-    public class LoginService 
+    public class LoginService : ILoginService
     {
         private readonly ERPDbContext _context;      
         private readonly BearerCode _bearerCode;

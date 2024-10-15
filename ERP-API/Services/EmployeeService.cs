@@ -4,10 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using ERP_API.Services.Tools;
 using Newtonsoft.Json.Linq;
 using AutoMapper;
+using ERP_API.Interfaces;
 
 namespace ERP_API.Services
 {
-    public class EmployeeService
+    public class EmployeeService : IEmployeeService
     {
         private readonly ERPDbContext _context;
 
@@ -34,7 +35,7 @@ namespace ERP_API.Services
             
         }
         
-        public async Task<Api_Response.ApiResponse <string>> RegisterEmployeeAsync(ReqEmployeeDto ReqEmployeeDto)
+        public async Task<Api_Response.ApiResponse <string>> RegisterEmployee(ReqEmployeeDto ReqEmployeeDto)
         {
 
 
@@ -57,7 +58,6 @@ namespace ERP_API.Services
 
                     var Company = responseJWT.Data.IdUserFkNavigation?.IdPersonFkNavigation?.IdCompanyFkNavigation;
 
-                    Console.WriteLine(Company);
                     if ( await UserExistsByUserName(ReqEmployeeDto.UserDto.UserName, Company.IdCompany))
                     {
                         return new Api_Response.ApiResponse<string>
@@ -114,7 +114,9 @@ namespace ERP_API.Services
                         NameUser = ReqEmployeeDto.UserDto.UserName,
                         CreationDateUser = ReqEmployeeDto.UserDto.CreationDateUser,
                         PasswordUser = newPassword,
-                        IdPersonFk = personId // Asignar la FK al usuario
+                        IdPersonFk = personId, // Asignar la FK al usuario
+                        IdCompanyFk = Company.IdCompany
+                       
                     };
 
                     _context.Users.Add(user);
@@ -138,6 +140,7 @@ namespace ERP_API.Services
                     var employee = _Mapper.Map<Employee>(ReqEmployeeDto?.EmployeeDto);
                     employee.IdUserFk =userId;
                     employee.VacationsEmployee = 0;
+                    employee.IdCompanyFk = Company.IdCompany;
 
                     _context.Employees.Add(employee);
                     await _context.SaveChangesAsync();
@@ -150,7 +153,9 @@ namespace ERP_API.Services
                     {
                         IdEmployeeFk = employeeId, // Asignar la FK del empleado
                         PathFileCurriculum = ReqEmployeeDto?.CurriculumDto?.PathFileCurriculum,
-                        DateUploaded = ReqEmployeeDto?.CurriculumDto?.DateUpload
+                        DateUploaded = ReqEmployeeDto?.CurriculumDto?.DateUpload,
+                        IdCompanyFk=Company.IdCompany
+                     
                     };
 
                     _context.Curriculum.Add(curriculum);
@@ -198,8 +203,6 @@ namespace ERP_API.Services
 
         private async Task<bool> UserExistsByUserName(string userName, int idCompany)
         {
-
-
             // Verificar si el nombre de usuario ya existe en la compañía
             return await _context.Users
                 .AnyAsync(u => u.NameUser == userName && u.IdPersonFkNavigation.IdCompanyFk == idCompany);
