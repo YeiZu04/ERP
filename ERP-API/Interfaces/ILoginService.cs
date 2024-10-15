@@ -6,10 +6,10 @@ namespace ERP_API.Interfaces
 {
     public interface ILoginService
     {
-        Task<Api_Response.ApiResponse<string>> Authenticate(LoginDto loginDto);
-        Task<Api_Response.ApiResponse<string>> Logout();
-        Task<Api_Response.ApiResponse<string>> RecoveryPassword(RecoveryPasswordDto recoveryPasswordDto);
-        Task<Api_Response.ApiResponse<string>> ChangePassword(ChangePasswordDto changePassword);
+        Task <string> Authenticate(LoginDto loginDto);
+        Task <string> Logout();
+        Task <string> RecoveryPassword(RecoveryPasswordDto recoveryPasswordDto);
+        Task <string> ChangePassword(ChangePasswordDto changePassword);
  
     }
 }
