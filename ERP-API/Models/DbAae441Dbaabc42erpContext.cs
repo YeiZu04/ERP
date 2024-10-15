@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ERP_API.Models;
 
-public partial class ERPDbContext : DbContext
+public partial class DbAae441Dbaabc42erpContext : DbContext
 {
-    public ERPDbContext()
+    public DbAae441Dbaabc42erpContext()
     {
     }
 
-    public ERPDbContext(DbContextOptions<ERPDbContext> options)
+    public DbAae441Dbaabc42erpContext(DbContextOptions<DbAae441Dbaabc42erpContext> options)
         : base(options)
     {
     }
@@ -611,4 +611,3 @@ public partial class ERPDbContext : DbContext
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }
-

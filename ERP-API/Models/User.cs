@@ -1,12 +1,9 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace ERP_API.Models;
 
-
-public partial class User 
-
+public partial class User
 {
     public int IdUser { get; set; }
 
@@ -18,7 +15,11 @@ public partial class User
 
     public int? IdPersonFk { get; set; }
 
+    public int? IdCompanyFk { get; set; }
+
     public virtual ICollection<Employee> Employees { get; set; } = new List<Employee>();
+
+    public virtual Company? IdCompanyFkNavigation { get; set; }
 
     public virtual Person? IdPersonFkNavigation { get; set; }
 

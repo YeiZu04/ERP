@@ -15,5 +15,9 @@ public partial class Warning
 
     public DateTime DateWarning { get; set; }
 
+    public int? IdCompanyFk { get; set; }
+
+    public virtual Company? IdCompanyFkNavigation { get; set; }
+
     public virtual Employee IdEmployeedFkNavigation { get; set; } = null!;
 }

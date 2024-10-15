@@ -11,5 +11,9 @@ public partial class Training
 
     public string? DescriptionTraining { get; set; }
 
+    public int? IdCompanyFk { get; set; }
+
+    public virtual Company? IdCompanyFkNavigation { get; set; }
+
     public virtual ICollection<TrainingEmployee> TrainingEmployees { get; set; } = new List<TrainingEmployee>();
 }

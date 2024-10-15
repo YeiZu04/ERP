@@ -13,5 +13,13 @@ public partial class Curriculum
 
     public DateTime? DateUploaded { get; set; }
 
+    public int? IdCandidateFk { get; set; }
+
+    public int? IdCompanyFk { get; set; }
+
+    public virtual Candidate? IdCandidateFkNavigation { get; set; }
+
+    public virtual Company? IdCompanyFkNavigation { get; set; }
+
     public virtual Employee? IdEmployeeFkNavigation { get; set; }
 }

@@ -15,5 +15,9 @@ public partial class WorkSchedule
 
     public int IdEmployeerFk { get; set; }
 
+    public int? IdCompanyFk { get; set; }
+
+    public virtual Company? IdCompanyFkNavigation { get; set; }
+
     public virtual Employee IdEmployeerFkNavigation { get; set; } = null!;
 }

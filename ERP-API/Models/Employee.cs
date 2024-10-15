@@ -19,9 +19,13 @@ public partial class Employee
 
     public int? IdUserFk { get; set; }
 
+    public int? IdCompanyFk { get; set; }
+
     public virtual ICollection<BenefitsEmployee> BenefitsEmployees { get; set; } = new List<BenefitsEmployee>();
 
     public virtual ICollection<Curriculum> Curricula { get; set; } = new List<Curriculum>();
+
+    public virtual Company? IdCompanyFkNavigation { get; set; }
 
     public virtual User? IdUserFkNavigation { get; set; }
 

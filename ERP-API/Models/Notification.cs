@@ -17,5 +17,9 @@ public partial class Notification
 
     public byte StatusNotification { get; set; }
 
+    public int? IdCompanyFk { get; set; }
+
+    public virtual Company? IdCompanyFkNavigation { get; set; }
+
     public virtual Employee IdEmployeedFkNavigation { get; set; } = null!;
 }

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ERP_API.Migrations
 {
     [DbContext(typeof(ERPDbContext))]
-    [Migration("20240830154943_AddFieldsToPersonAndRole")]
-    partial class AddFieldsToPersonAndRole
+    [Migration("20241014211325_ERPCambiosCurriculum")]
+    partial class ERPCambiosCurriculum
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -165,9 +165,15 @@ namespace ERP_API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdCurriculum"));
 
+                    b.Property<int?>("CandidateFk")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("DateUploaded")
                         .HasColumnType("date")
                         .HasColumnName("date_uploaded");
+
+                    b.Property<int?>("IdCanidateFkNavigationIdCandidate")
+                        .HasColumnType("int");
 
                     b.Property<int?>("IdEmployeeFk")
                         .HasColumnType("int")
@@ -181,6 +187,8 @@ namespace ERP_API.Migrations
 
                     b.HasKey("IdCurriculum")
                         .HasName("PK__Curricul__8151415FCF29CF7D");
+
+                    b.HasIndex("IdCanidateFkNavigationIdCandidate");
 
                     b.HasIndex("IdEmployeeFk");
 
@@ -438,7 +446,8 @@ namespace ERP_API.Migrations
                         .HasColumnName("nationality_person");
 
                     b.Property<Guid>("PersonUUID")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("UUID_person");
 
                     b.Property<string>("PhoneNumberPerson")
                         .HasMaxLength(100)
@@ -472,8 +481,8 @@ namespace ERP_API.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdRole"));
 
                     b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Description_role");
 
                     b.Property<string>("TypeRole")
                         .HasMaxLength(100)
@@ -818,10 +827,16 @@ namespace ERP_API.Migrations
 
             modelBuilder.Entity("ERP_API.Models.Curriculum", b =>
                 {
+                    b.HasOne("ERP_API.Models.Candidate", "IdCanidateFkNavigation")
+                        .WithMany()
+                        .HasForeignKey("IdCanidateFkNavigationIdCandidate");
+
                     b.HasOne("ERP_API.Models.Employee", "IdEmployeeFkNavigation")
                         .WithMany("Curricula")
                         .HasForeignKey("IdEmployeeFk")
                         .HasConstraintName("FK__Curriculu__id_em__4D94879B");
+
+                    b.Navigation("IdCanidateFkNavigation");
 
                     b.Navigation("IdEmployeeFkNavigation");
                 });

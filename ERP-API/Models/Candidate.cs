@@ -13,9 +13,13 @@ public partial class Candidate
 
     public string? PositionAppliedCandidate { get; set; }
 
-    public virtual ICollection<CurriculumCandidate> CurriculumCandidates { get; set; } = new List<CurriculumCandidate>();
+    public int? IdCompanyFk { get; set; }
+
+    public virtual ICollection<Curriculum> Curricula { get; set; } = new List<Curriculum>();
 
     public virtual ICollection<FilterCandidate> FilterCandidates { get; set; } = new List<FilterCandidate>();
+
+    public virtual Company? IdCompanyFkNavigation { get; set; }
 
     public virtual Person? IdPersonFkNavigation { get; set; }
 }

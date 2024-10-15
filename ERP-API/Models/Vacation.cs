@@ -17,5 +17,9 @@ public partial class Vacation
 
     public int? IdEmployeeFk { get; set; }
 
+    public int? IdCompanyFk { get; set; }
+
+    public virtual Company? IdCompanyFkNavigation { get; set; }
+
     public virtual Employee? IdEmployeeFkNavigation { get; set; }
 }

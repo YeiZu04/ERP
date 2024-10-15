@@ -4,6 +4,7 @@ using ERP_API.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ERP_API.Migrations
 {
     [DbContext(typeof(ERPDbContext))]
-    partial class ERPDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241014201213_ERPDbContextModelSnapshotMigrationNewDB")]
+    partial class ERPDbContextModelSnapshotMigrationNewDB
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -162,15 +165,9 @@ namespace ERP_API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdCurriculum"));
 
-                    b.Property<int?>("CandidateFk")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("DateUploaded")
                         .HasColumnType("date")
                         .HasColumnName("date_uploaded");
-
-                    b.Property<int?>("IdCanidateFkNavigationIdCandidate")
-                        .HasColumnType("int");
 
                     b.Property<int?>("IdEmployeeFk")
                         .HasColumnType("int")
@@ -184,8 +181,6 @@ namespace ERP_API.Migrations
 
                     b.HasKey("IdCurriculum")
                         .HasName("PK__Curricul__8151415FCF29CF7D");
-
-                    b.HasIndex("IdCanidateFkNavigationIdCandidate");
 
                     b.HasIndex("IdEmployeeFk");
 
@@ -824,16 +819,10 @@ namespace ERP_API.Migrations
 
             modelBuilder.Entity("ERP_API.Models.Curriculum", b =>
                 {
-                    b.HasOne("ERP_API.Models.Candidate", "IdCanidateFkNavigation")
-                        .WithMany()
-                        .HasForeignKey("IdCanidateFkNavigationIdCandidate");
-
                     b.HasOne("ERP_API.Models.Employee", "IdEmployeeFkNavigation")
                         .WithMany("Curricula")
                         .HasForeignKey("IdEmployeeFk")
                         .HasConstraintName("FK__Curriculu__id_em__4D94879B");
-
-                    b.Navigation("IdCanidateFkNavigation");
 
                     b.Navigation("IdEmployeeFkNavigation");
                 });

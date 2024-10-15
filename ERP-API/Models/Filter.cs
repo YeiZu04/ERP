@@ -17,5 +17,9 @@ public partial class Filter
 
     public string? ObservationAboutCandidate { get; set; }
 
+    public int? IdCompanyFk { get; set; }
+
     public virtual ICollection<FilterCandidate> FilterCandidates { get; set; } = new List<FilterCandidate>();
+
+    public virtual Company? IdCompanyFkNavigation { get; set; }
 }
