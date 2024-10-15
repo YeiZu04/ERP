@@ -3,10 +3,11 @@ using ERP_API.Models;
 using Microsoft.EntityFrameworkCore;
 using ERP_API.Services.Tools;
 using AutoMapper;
+using ERP_API.Interfaces;
 
 namespace ERP_API.Services
 {
-    public class EmployeeService
+    public class EmployeeService : IEmployeeService
     {
         private readonly ERPDbContext _context;
         private readonly PasswordHash _passwordHash;
@@ -25,6 +26,7 @@ namespace ERP_API.Services
             _Mapper = mapper;
         }
 
+
         public async Task<string> RegisterEmployeeAsync(ReqEmployeeDto ReqEmployeeDto)
         {
             using (var transaction = await _context.Database.BeginTransactionAsync())
@@ -39,7 +41,10 @@ namespace ERP_API.Services
 
                     var Company = responseJWT.Data.IdUserFkNavigation?.IdPersonFkNavigation?.IdCompanyFkNavigation;
 
+
                     if (await UserExistsByUserName(ReqEmployeeDto.UserDto.UserName, Company.IdCompany))
+
+
                     {
                         throw new InvalidOperationException("El userName ya está registrado.");
                     }
@@ -82,7 +87,9 @@ namespace ERP_API.Services
                         NameUser = ReqEmployeeDto.UserDto.UserName,
                         CreationDateUser = ReqEmployeeDto.UserDto.CreationDateUser,
                         PasswordUser = newPassword,
-                        IdPersonFk = personId // Asignar la FK al usuario
+                        IdPersonFk = personId, // Asignar la FK al usuario
+                        IdCompanyFk = Company.IdCompany
+                       
                     };
 
                     _context.Users.Add(user);
@@ -104,6 +111,7 @@ namespace ERP_API.Services
                     var employee = _Mapper.Map<Employee>(ReqEmployeeDto?.EmployeeDto);
                     employee.IdUserFk = userId;
                     employee.VacationsEmployee = 0;
+                    employee.IdCompanyFk = Company.IdCompany;
 
                     _context.Employees.Add(employee);
                     await _context.SaveChangesAsync();
@@ -115,7 +123,9 @@ namespace ERP_API.Services
                     {
                         IdEmployeeFk = employeeId, // Asignar la FK del empleado
                         PathFileCurriculum = ReqEmployeeDto?.CurriculumDto?.PathFileCurriculum,
-                        DateUploaded = ReqEmployeeDto?.CurriculumDto?.DateUpload
+                        DateUploaded = ReqEmployeeDto?.CurriculumDto?.DateUpload,
+                        IdCompanyFk=Company.IdCompany
+                     
                     };
 
                     _context.Curriculum.Add(curriculum);

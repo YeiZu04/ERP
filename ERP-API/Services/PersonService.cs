@@ -3,10 +3,11 @@ using ERP_API.DTOs;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using ERP_API.Services.Tools;
+using ERP_API.Interfaces;
 
 namespace ERP_API.Services
 {
-    public class PersonService
+    public class PersonService : IPersonService
     {
         private readonly ERPDbContext _context;
         private readonly IMapper _mapper;
@@ -24,7 +25,51 @@ namespace ERP_API.Services
             var responseJWT = await _bearerCode.VerficationCode();
             if (!responseJWT.Success)
             {
+
                 throw new UnauthorizedAccessException(responseJWT.ErrorMessage);
+
+                var responseJWT = await _bearerCode.VerficationCode();
+                if (responseJWT.Success == false)
+                {
+                    return new ApiResponse<ResPersonDto>
+                    {
+                        Success = false,
+                        ErrorCode = responseJWT.ErrorCode,
+                        ErrorMessage = responseJWT.ErrorMessage
+                    };
+                }
+
+                var Company = responseJWT.Data.IdUserFkNavigation?.IdPersonFkNavigation?.IdCompanyFkNavigation;
+                // Buscar la persona existente en la base de datos
+                var person = await _context.Person.AsNoTracking().FirstOrDefaultAsync(p => p.PersonUUID == resPersonDto.PersonUUID && p.IdCompanyFk == Company.IdCompany);
+
+                // Verificar si la persona existe
+                if (person == null)
+                {
+                    return new ApiResponse<ResPersonDto>
+                    {
+                        Success = false,
+                        ErrorCode = ErrorCode.NotFound,
+                        ErrorMessage = "Persona no encontrada."
+                    };
+                }
+
+                // Mapear los datos del DTO al objeto Person
+                var newPerson= _mapper.Map<Person>(resPersonDto);
+                newPerson.IdPerson = person.IdPerson;
+                newPerson.IdCompanyFk = Company?.IdCompany;
+                newPerson.StatePerson = 1;
+
+                _context.Person.Update(newPerson);
+                await _context.SaveChangesAsync();
+
+                // Retornar respuesta exitosa
+                return new ApiResponse<ResPersonDto>
+                {
+                    Success = true,
+                    Data = _mapper.Map<ResPersonDto>(newPerson)
+                };
+
             }
 
             var company = responseJWT.Data.IdUserFkNavigation?.IdPersonFkNavigation?.IdCompanyFkNavigation;

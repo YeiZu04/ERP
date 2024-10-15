@@ -4,11 +4,12 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using static ERP_API.Services.Tools.Api_Response;
 using ERP_API.Services.Tools;
+using ERP_API.Interfaces;
 
 
 namespace ERP_API.Services
 {
-    public class CompanyService
+    public class CompanyService : ICompanyService
     {
              private readonly ERPDbContext _context;
         private readonly IMapper _mapper;
