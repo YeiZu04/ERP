@@ -4,6 +4,7 @@ using ERP_API.Services.Tools;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using ERP_API.Interfaces;
 
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -31,20 +32,16 @@ builder.Services.AddHttpClient();
 builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddControllers();
-builder.Services.AddScoped<BearerCode>();
-builder.Services.AddScoped<EmployeeService>();
-builder.Services.AddScoped<PasswordHash>();
-builder.Services.AddScoped<SendEmail>();
-builder.Services.AddScoped<RandomGenerator>();
-builder.Services.AddScoped<Api_Response>();
-builder.Services.AddScoped<CompanyService>();
-builder.Services.AddScoped<PermissionService>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddScoped<ICompanyService, CompanyService>();
+builder.Services.AddScoped<IPermissionService, PermissionService>();
+builder.Services.AddScoped<IPersonService, PersonService>();
+builder.Services.AddScoped<ILoginService, LoginService>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<LoginService>();
-builder.Services.AddScoped<PersonService>();
+
 
 
 // Configuraci�n de Swagger para JWT

@@ -5,10 +5,11 @@ using Microsoft.EntityFrameworkCore;
 using static ERP_API.Services.Tools.Api_Response;
 using System.ComponentModel.Design;
 using ERP_API.Services.Tools;
+using ERP_API.Interfaces;
 namespace ERP_API.Services
 
 {
-    public class PersonService
+    public class PersonService : IPersonService
     {
 
         private readonly ERPDbContext _context;
@@ -57,7 +58,7 @@ namespace ERP_API.Services
                 // Mapear los datos del DTO al objeto Person
                 var newPerson= _mapper.Map<Person>(resPersonDto);
                 newPerson.IdPerson = person.IdPerson;
-                newPerson.IdCompanyFk = Company.IdCompany;
+                newPerson.IdCompanyFk = Company?.IdCompany;
                 newPerson.StatePerson = 1;
 
                 _context.Person.Update(newPerson);

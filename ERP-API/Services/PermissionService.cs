@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using ERP_API.DTOs;
+using ERP_API.Interfaces;
 using ERP_API.Models;
 using ERP_API.Services.Tools;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +11,7 @@ using static ERP_API.Services.Tools.Api_Response;
 
 namespace ERP_API.Services
 {
-    public class PermissionService
+    public class PermissionService : IPermissionService
     {
         private readonly ERPDbContext _context;
         private readonly IMapper _mapper;
