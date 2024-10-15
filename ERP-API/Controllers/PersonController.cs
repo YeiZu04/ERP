@@ -1,10 +1,11 @@
 ﻿using ERP_API.DTOs;
 using ERP_API.Services;
-using ERP_API.Services.Tools;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize] // Protege todos los métodos de este controlador
 public class PersonController : ControllerBase
 {
     private readonly PersonService _personService;
@@ -18,42 +19,16 @@ public class PersonController : ControllerBase
     [HttpGet("list")]
     public async Task<IActionResult> ListPerson()
     {
-        var result = await _personService.ListPerson();
-
-        if (result.Success)
-        {
-            return Ok(result);
-        }
-        else
-        {
-            return result.ErrorCode switch
-            {
-                Api_Response.ErrorCode.NotFound => NotFound(new { message = result.ErrorMessage }),
-                Api_Response.ErrorCode.InvalidInput => BadRequest(new { message = result.ErrorMessage }),
-                _ => StatusCode(500, new { message = result.ErrorMessage })
-            };
-        }
+        var people = await _personService.ListPerson();
+        return Ok(people);
     }
 
     // PUT: api/Person/update
     [HttpPut("update")]
     public async Task<IActionResult> UpdatePerson([FromBody] ResPersonDto resPersonDto)
     {
-        var result = await _personService.UpdatePerson(resPersonDto);
-
-        if (result.Success)
-        {
-            return Ok(result);
-        }
-        else
-        {
-            return result.ErrorCode switch
-            {
-                Api_Response.ErrorCode.NotFound => NotFound(new { message = result.ErrorMessage }),
-                Api_Response.ErrorCode.InvalidInput => BadRequest(new { message = result.ErrorMessage }),
-                _ => StatusCode(500, new { message = result.ErrorMessage })
-            };
-        }
+        var person = await _personService.UpdatePerson(resPersonDto);
+        return Ok(person);
     }
 
     // DELETE: api/Person/delete
@@ -61,20 +36,6 @@ public class PersonController : ControllerBase
     public async Task<IActionResult> DeletePerson([FromBody] ResPersonDto resPersonDto)
     {
         var result = await _personService.DeletePerson(resPersonDto);
-
-        if (result.Success)
-        {
-            return Ok(result);
-        }
-        else
-        {
-            return result.ErrorCode switch
-            {
-                Api_Response.ErrorCode.NotFound => NotFound(new { message = result.ErrorMessage }),
-                Api_Response.ErrorCode.InvalidInput => BadRequest(new { message = result.ErrorMessage }),
-                _ => StatusCode(500, new { message = result.ErrorMessage })
-            };
-        }
+        return Ok(new { message = result });
     }
 }
- 

@@ -1,13 +1,11 @@
 ﻿using ERP_API.DTOs;
 using ERP_API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ERP_API.Services.Tools;
-using static ERP_API.Services.Tools.Api_Response;
-
 
 [ApiController]
 [Route("api/[controller]")]
-
+[Authorize] // Protege todos los métodos de este controlador
 public class CompanyController : ControllerBase
 {
     private readonly CompanyService _companyService;
@@ -21,91 +19,31 @@ public class CompanyController : ControllerBase
     [HttpGet("list")]
     public async Task<IActionResult> ListCompanies()
     {
-        var response = await _companyService.ListCompanies();
-
-        if (response.Success)
-        {
-            return Ok(response);
-        }
-        else
-        {
-            return response.ErrorCode switch
-            {
-                Api_Response.ErrorCode.UserAlreadyExists => Conflict(new { message = response.ErrorMessage }),
-                Api_Response.ErrorCode.InvalidInput => BadRequest(new { message = response.ErrorMessage }),
-                Api_Response.ErrorCode.NotFound => NotFound(new { message = response.ErrorMessage }),
-                Api_Response.ErrorCode.errorDataBase => StatusCode(500, new { message = response.ErrorMessage }),
-                _ => StatusCode(500, new { message = response.ErrorMessage })
-            };
-        }
+        var companies = await _companyService.ListCompanies();
+        return Ok(companies);  // El middleware se encargará de los errores
     }
-
 
     // POST: api/Company/create
     [HttpPost("create")]
     public async Task<IActionResult> CreateCompany([FromBody] ReqCompanyDto reqCompanyDto)
     {
-        var response = await _companyService.CreateCompany(reqCompanyDto);
-
-        if (response.Success)
-        {
-            return Ok(response);
-        }
-        else
-        {
-            return response.ErrorCode switch
-            {
-                Api_Response.ErrorCode.UserAlreadyExists => Conflict(new { message = response.ErrorMessage }),
-                Api_Response.ErrorCode.InvalidInput => BadRequest(new { message = response.ErrorMessage }),
-                Api_Response.ErrorCode.NotFound => NotFound(new { message = response.ErrorMessage }),
-                Api_Response.ErrorCode.errorDataBase => StatusCode(500, new { message = response.ErrorMessage }),
-                _ => StatusCode(500, new { message = response.ErrorMessage })
-            };
-        }
+        var company = await _companyService.CreateCompany(reqCompanyDto);
+        return Ok(company);  // El middleware se encargará de los errores
     }
 
-    // PUT: api/Company/update/{id}
+    // PUT: api/Company/update
     [HttpPut("update")]
-    public async Task<IActionResult> UpdateCompany( [FromBody] ReqCompanyDto reqCompanyDto)
+    public async Task<IActionResult> UpdateCompany([FromBody] ReqCompanyDto reqCompanyDto)
     {
-        var response = await _companyService.UpdateCompany( reqCompanyDto);
-
-        if (response.Success)
-        {
-            return Ok(response);
-        }else
-        {
-            return response.ErrorCode switch
-            {
-                Api_Response.ErrorCode.UserAlreadyExists => Conflict(new { message = response.ErrorMessage }),
-                Api_Response.ErrorCode.InvalidInput => BadRequest(new { message = response.ErrorMessage }),
-                Api_Response.ErrorCode.NotFound => NotFound(new { message = response.ErrorMessage }),
-                Api_Response.ErrorCode.errorDataBase => StatusCode(500, new { message = response.ErrorMessage }),
-                _ => StatusCode(500, new { message = response.ErrorMessage })
-            };
-        }
+        var company = await _companyService.UpdateCompany(reqCompanyDto);
+        return Ok(company);  // El middleware se encargará de los errores
     }
 
     // DELETE: api/Company/delete
     [HttpDelete("delete")]
     public async Task<IActionResult> DeleteCompany([FromBody] ReqCompanyDto reqCompanyDto)
     {
-        var response = await _companyService.DeleteCompany(reqCompanyDto);
-
-        if (response.Success)
-        {
-            return Ok( response);
-        }else
-        {
-            return response.ErrorCode switch
-            {
-                Api_Response.ErrorCode.UserAlreadyExists => Conflict(new { message = response.ErrorMessage }),
-                Api_Response.ErrorCode.InvalidInput => BadRequest(new { message = response.ErrorMessage }),
-                Api_Response.ErrorCode.NotFound => NotFound(new { message = response.ErrorMessage }),
-                Api_Response.ErrorCode.errorDataBase => StatusCode(500, new { message = response.ErrorMessage }),
-                _ => StatusCode(500, new { message = response.ErrorMessage })
-            };
-        }
+        await _companyService.DeleteCompany(reqCompanyDto);
+        return Ok(new { message = "Compañía eliminada exitosamente" });  // El middleware se encargará de los errores
     }
 }
-

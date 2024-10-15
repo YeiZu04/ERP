@@ -3,11 +3,9 @@ using ERP_API.DTOs;
 using ERP_API.Interfaces;
 using ERP_API.Models;
 using ERP_API.Services.Tools;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using static ERP_API.Services.Tools.Api_Response;
 
 namespace ERP_API.Services
 {
@@ -25,168 +23,74 @@ namespace ERP_API.Services
         }
 
         // Método para crear un permiso
-        public async Task<ApiResponse<ResPermissionDto>> CreatePermission(ReqPermissionDto reqPermissionDto)
+        public async Task<ResPermissionDto> CreatePermission(ReqPermissionDto reqPermissionDto)
         {
-            try
+            var responseJWT = await _bearerCode.VerficationCode();
+            if (!responseJWT.Success)
             {
-                var responseJWT = await _bearerCode.VerficationCode();
-                if (responseJWT.Success == false)
-                {
-                    return new ApiResponse<ResPermissionDto>{
-                        Success = false,
-                        ErrorCode = responseJWT.ErrorCode,
-                        ErrorMessage = responseJWT.ErrorMessage
-                    };
-                }
-                var permission = _mapper.Map<Permission>(reqPermissionDto);
-                _context.Permissions.Add(permission);
-                await _context.SaveChangesAsync();
-
-                var resPermissionDto = _mapper.Map<ResPermissionDto>(permission);
-
-                return new ApiResponse<ResPermissionDto>
-                {
-                    Success = true,
-                    Data = resPermissionDto
-                };
+                throw new UnauthorizedAccessException(responseJWT.ErrorMessage);
             }
-            catch (Exception ex)
-            {
-                return new ApiResponse<ResPermissionDto>
-                {
-                    Success = false,
-                    ErrorCode = ErrorCode.GeneralError,
-                    ErrorMessage = $"Error al crear el permiso: {ex.Message}"
-                };
-            }
+
+            var permission = _mapper.Map<Permission>(reqPermissionDto);
+            _context.Permissions.Add(permission);
+            await _context.SaveChangesAsync();
+
+            return _mapper.Map<ResPermissionDto>(permission);
         }
 
         // Método para listar todos los permisos
-        public async Task<ApiResponse<List<ResPermissionDto>>> ListPermissions()
+        public async Task<List<ResPermissionDto>> ListPermissions()
         {
-            try
+            var responseJWT = await _bearerCode.VerficationCode();
+            if (!responseJWT.Success)
             {
-                var responseJWT = await _bearerCode.VerficationCode();
-                if (responseJWT.Success == false)
-                {
-                    return new ApiResponse<List<ResPermissionDto>>
-                    {
-                        Success = false,
-                        ErrorCode = responseJWT.ErrorCode,
-                        ErrorMessage = responseJWT.ErrorMessage
-                    };
-                }
-                var permissions = await _context.Permissions.ToListAsync();
-                var resPermissionList = _mapper.Map<List<ResPermissionDto>>(permissions);
+                throw new UnauthorizedAccessException(responseJWT.ErrorMessage);
+            }
 
-                return new ApiResponse<List<ResPermissionDto>>
-                {
-                    Success = true,
-                    Data = resPermissionList
-                };
-            }
-            catch (Exception ex)
-            {
-                return new ApiResponse<List<ResPermissionDto>>
-                {
-                    Success = false,
-                    ErrorCode = ErrorCode.GeneralError,
-                    ErrorMessage = $"Error al obtener la lista de permisos: {ex.Message}"
-                };
-            }
+            var permissions = await _context.Permissions.ToListAsync();
+            return _mapper.Map<List<ResPermissionDto>>(permissions);
         }
 
         // Método para actualizar un permiso
-        public async Task<ApiResponse<ResPermissionDto>> UpdatePermission( ReqPermissionDto reqPermissionDto)
+        public async Task<ResPermissionDto> UpdatePermission(ReqPermissionDto reqPermissionDto)
         {
-            try
+            var responseJWT = await _bearerCode.VerficationCode();
+            if (!responseJWT.Success)
             {
-                var responseJWT = await _bearerCode.VerficationCode();
-                if (responseJWT.Success == false)
-                {
-                    return new ApiResponse<ResPermissionDto>
-                    {
-                        Success = false,
-                        ErrorCode = responseJWT.ErrorCode,
-                        ErrorMessage = responseJWT.ErrorMessage
-                    };
-                }
-                var permission = await _context.Permissions.FirstOrDefaultAsync(p => p.IdPermission == reqPermissionDto.IdPermission);
-                if (permission == null)
-                {
-                    return new ApiResponse<ResPermissionDto>
-                    {
-                        Success = false,
-                        ErrorCode = ErrorCode.NotFound,
-                        ErrorMessage = "Permiso no encontrado."
-                    };
-                }
-
-                _mapper.Map(reqPermissionDto, permission);
-                await _context.SaveChangesAsync();
-
-                var resPermissionDto = _mapper.Map<ResPermissionDto>(permission);
-                return new ApiResponse<ResPermissionDto>
-                {
-                    Success = true,
-                    Data = resPermissionDto
-                };
+                throw new UnauthorizedAccessException(responseJWT.ErrorMessage);
             }
-            catch (Exception ex)
+
+            var permission = await _context.Permissions.FirstOrDefaultAsync(p => p.IdPermission == reqPermissionDto.IdPermission);
+            if (permission == null)
             {
-                return new ApiResponse<ResPermissionDto>
-                {
-                    Success = false,
-                    ErrorCode = ErrorCode.GeneralError,
-                    ErrorMessage = $"Error al actualizar el permiso: {ex.Message}"
-                };
+                throw new KeyNotFoundException("Permiso no encontrado.");
             }
+
+            _mapper.Map(reqPermissionDto, permission);
+            await _context.SaveChangesAsync();
+
+            return _mapper.Map<ResPermissionDto>(permission);
         }
 
         // Método para eliminar un permiso
-        public async Task<ApiResponse<string>> DeletePermission(ReqPermissionDto reqPermissionDto)
+        public async Task<string> DeletePermission(ReqPermissionDto reqPermissionDto)
         {
-            try
+            var responseJWT = await _bearerCode.VerficationCode();
+            if (!responseJWT.Success)
             {
-                var responseJWT = await _bearerCode.VerficationCode();
-                if (responseJWT.Success == false)
-                {
-                    return new ApiResponse<string>
-                    {
-                        Success = false,
-                        ErrorCode = responseJWT.ErrorCode,
-                        ErrorMessage = responseJWT.ErrorMessage
-                    };
-                }
-                var permission = await _context.Permissions.FirstOrDefaultAsync(p => p.IdPermission == reqPermissionDto.IdPermission);
-                if (permission == null)
-                {
-                    return new ApiResponse<string>
-                    {
-                        Success = false,
-                        ErrorCode = ErrorCode.NotFound,
-                        ErrorMessage = "Permiso no encontrado."
-                    };
-                }
-
-                _context.Permissions.Remove(permission);
-                await _context.SaveChangesAsync();
-
-                return new ApiResponse<string>
-                {
-                    Success = true,
-                    Data = "Permiso eliminado correctamente."
-                };
+                throw new UnauthorizedAccessException(responseJWT.ErrorMessage);
             }
-            catch (Exception ex)
+
+            var permission = await _context.Permissions.FirstOrDefaultAsync(p => p.IdPermission == reqPermissionDto.IdPermission);
+            if (permission == null)
             {
-                return new ApiResponse<string>
-                {
-                    Success = false,
-                    ErrorCode = ErrorCode.GeneralError,
-                    ErrorMessage = $"Error al eliminar el permiso: {ex.Message}"
-                };
+                throw new KeyNotFoundException("Permiso no encontrado.");
             }
+
+            _context.Permissions.Remove(permission);
+            await _context.SaveChangesAsync();
+
+            return "Permiso eliminado correctamente.";
         }
     }
 }
