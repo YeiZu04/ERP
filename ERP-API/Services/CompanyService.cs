@@ -10,11 +10,11 @@ namespace ERP_API.Services
 {
     public class CompanyService
     {
-        private readonly ERPDbContext _context;
+             private readonly ERPDbContext _context;
         private readonly IMapper _mapper;
         private readonly BearerCode _bearerCode;
 
-        public CompanyService(ERPDbContext context, IMapper mapper , BearerCode bearerCode)
+        public CompanyService(ERPDbContext context, IMapper mapper, BearerCode bearerCode)
         {
             _context = context;
             _mapper = mapper;
@@ -22,184 +22,69 @@ namespace ERP_API.Services
         }
 
         // CREATE
-        public async Task<ApiResponse<ResCompanyDto>> CreateCompany(ReqCompanyDto reqCompanyDto)
+        public async Task<ResCompanyDto> CreateCompany(ReqCompanyDto reqCompanyDto)
         {
-            try
-            {
-                var responseJWT = await _bearerCode.VerficationCode();
-                if (responseJWT.Success == false)
-                {
-                    return new ApiResponse<ResCompanyDto>
-                    {
-                        Success = false,
-                        ErrorCode = responseJWT.ErrorCode,
-                        ErrorMessage = responseJWT.ErrorMessage
-                    };
-                }
-                var company = _mapper.Map<Company>(reqCompanyDto);
-                company.StatusCompany = 1;
+            var responseJWT = await _bearerCode.VerficationCode();
+            if (!responseJWT.Success)
+                throw new UnauthorizedAccessException("Acceso no autorizado.");
 
-                _context.Companies.Add(company);
-                await _context.SaveChangesAsync();
+            var company = _mapper.Map<Company>(reqCompanyDto);
+            company.StatusCompany = 1;
 
-                var resCompanyDto = _mapper.Map<ResCompanyDto>(company);
+            _context.Companies.Add(company);
+            await _context.SaveChangesAsync();
 
-                return new ApiResponse<ResCompanyDto>
-                {
-                    Success = true,
-                    Data = resCompanyDto
-                };
-            }
-            catch (Exception ex)
-            {
-                return new ApiResponse<ResCompanyDto>
-                {
-                    Success = false,
-                    ErrorCode = ErrorCode.GeneralError,
-                    ErrorMessage = $"Error al crear la compañía: {ex.Message}"
-                };
-            }
+            return _mapper.Map<ResCompanyDto>(company);
         }
 
         // UPDATE
-        public async Task<ApiResponse<ResCompanyDto>> UpdateCompany(ReqCompanyDto reqCompanyDto)
+        public async Task<ResCompanyDto> UpdateCompany(ReqCompanyDto reqCompanyDto)
         {
-            try
-            {
-                var responseJWT = await _bearerCode.VerficationCode();
+            var responseJWT = await _bearerCode.VerficationCode();
+            if (!responseJWT.Success)
+                throw new UnauthorizedAccessException("Acceso no autorizado.");
 
-                if (responseJWT.Success == false)
-                {
-                    return new ApiResponse<ResCompanyDto>
-                    {
-                        Success = false,
-                        ErrorCode = responseJWT.ErrorCode,
-                        ErrorMessage = responseJWT.ErrorMessage
-                    };
-                }
+            var company = await _context.Companies.FindAsync(reqCompanyDto.IdCompany);
+            if (company == null)
+                throw new KeyNotFoundException("Compañía no encontrada.");
 
-                var company = await _context.Companies.FindAsync(reqCompanyDto.IdCompany);
-                if (company == null)
-                {
-                    return new ApiResponse<ResCompanyDto>
-                    {
-                        Success = false,
-                        ErrorCode = ErrorCode.NotFound,
-                        ErrorMessage = "Compañía no encontrada."
-                    };
-                }
+            _mapper.Map(reqCompanyDto, company);
+            company.StatusCompany = 1;
 
-                _mapper.Map(reqCompanyDto, company);
-                company.StatusCompany = 1;
+            _context.Companies.Update(company);
+            await _context.SaveChangesAsync();
 
-                _context.Companies.Update(company);
-                await _context.SaveChangesAsync();
-
-                var resCompanyDto = _mapper.Map<ResCompanyDto>(company);
-
-                return new ApiResponse<ResCompanyDto>
-                {
-                    Success = true,
-                    Data = resCompanyDto
-                };
-            }
-            catch (Exception ex)
-            {
-                return new ApiResponse<ResCompanyDto>
-                {
-                    Success = false,
-                    ErrorCode = ErrorCode.GeneralError,
-                    ErrorMessage = $"Error al actualizar la compañía: {ex.Message}"
-                };
-            }
+            return _mapper.Map<ResCompanyDto>(company);
         }
 
         // DELETE (Cambiar estado en lugar de eliminar)
-        public async Task<ApiResponse<string>> DeleteCompany(ReqCompanyDto reqCompanyDto)
+        public async Task DeleteCompany(ReqCompanyDto reqCompanyDto)
         {
-            try
-            {
-                var responseJWT = await _bearerCode.VerficationCode();
+            var responseJWT = await _bearerCode.VerficationCode();
+            if (!responseJWT.Success)
+                throw new UnauthorizedAccessException("Acceso no autorizado.");
 
-                if (responseJWT.Success == false)
-                {
-                    return new ApiResponse<string>
-                    {
-                        Success = false,
-                        ErrorCode = responseJWT.ErrorCode,
-                        ErrorMessage = responseJWT.ErrorMessage
-                    };
-                }
+            var company = await _context.Companies.FindAsync(reqCompanyDto.IdCompany);
+            if (company == null)
+                throw new KeyNotFoundException("Compañía no encontrada.");
 
-                var company = await _context.Companies.FindAsync(reqCompanyDto.IdCompany);
-                if (company == null)
-                {
-                    return new ApiResponse<string>
-                    {
-                        Success = false,
-                        ErrorCode = ErrorCode.NotFound,
-                        ErrorMessage = "Compañía no encontrada."
-                    };
-                }
-
-                company.StatusCompany = 0; // Cambiamos el estado a 0 para inactivar la compañía
-                _context.Companies.Update(company);
-                await _context.SaveChangesAsync();
-
-                return new ApiResponse<string>
-                {
-                    Success = true,
-                    Data = "Compañía eliminada exitosamente."
-                };
-            }
-            catch (Exception ex)
-            {
-                return new ApiResponse<string>
-                {
-                    Success = false,
-                    ErrorCode = ErrorCode.GeneralError,
-                    ErrorMessage = $"Error al eliminar la compañía: {ex.Message}"
-                };
-            }
+            company.StatusCompany = 0; // Cambiamos el estado a inactivo
+            _context.Companies.Update(company);
+            await _context.SaveChangesAsync();
         }
 
         // LIST ALL
-        public async Task<ApiResponse<List<ResCompanyDto>>> ListCompanies()
+        public async Task<List<ResCompanyDto>> ListCompanies()
         {
-            try
-            {
-                var responseJWT = await _bearerCode.VerficationCode();
-                if (responseJWT.Success == false)
-                    {
-                    return new ApiResponse<List<ResCompanyDto>>
-                    {
-                        Success = false,
-                        ErrorCode = responseJWT.ErrorCode,
-                        ErrorMessage = responseJWT.ErrorMessage
-                    };
-                }
+            var responseJWT = await _bearerCode.VerficationCode();
+            if (!responseJWT.Success)
+                throw new UnauthorizedAccessException("Acceso no autorizado.");
 
-                var companies = await _context.Companies
-                    .Where(c => c.StatusCompany == 1)
-                    .ToListAsync();
+            var companies = await _context.Companies
+                .Where(c => c.StatusCompany == 1)
+                .ToListAsync();
 
-                var resCompanyDtos = _mapper.Map<List<ResCompanyDto>>(companies);
-
-                return new ApiResponse<List<ResCompanyDto>>
-                {
-                    Success = true,
-                    Data = resCompanyDtos
-                };
-            }
-            catch (Exception ex)
-            {
-                return new ApiResponse<List<ResCompanyDto>>
-                {
-                    Success = false,
-                    ErrorCode = ErrorCode.GeneralError,
-                    ErrorMessage = $"Error al listar las compañías: {ex.Message}"
-                };
-            }
+            return _mapper.Map<List<ResCompanyDto>>(companies);
         }
     }
 }
