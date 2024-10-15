@@ -348,7 +348,7 @@ public partial class DbAae441Dbaabc42erpContext : DbContext
                 .HasMaxLength(100)
                 .HasColumnName("second_last_name_person");
             entity.Property(e => e.StatePerson).HasColumnName("state_person");
-            entity.Property(e => e.UuidPerson).HasColumnName("UUID_person");
+            entity.Property(e => e.PersonUUID).HasColumnName("UUID_person");
 
             entity.HasOne(d => d.IdCompanyFkNavigation).WithMany(p => p.People)
                 .HasForeignKey(d => d.IdCompanyFk)

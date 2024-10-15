@@ -29,7 +29,7 @@ public partial class Person
 
     public int? IdCompanyFk { get; set; }
 
-    public Guid UuidPerson { get; set; }
+    public Guid PersonUUID { get; set; }
 
     public virtual ICollection<Candidate> Candidates { get; set; } = new List<Candidate>();
 

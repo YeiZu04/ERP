@@ -9,11 +9,11 @@ namespace ERP_API.DTOs
 
         [Required]
         [StringLength(100)]
-        public string NameCompany { get; set; }
+        public string? NameCompany { get; set; }
 
         [Required]
         [StringLength(100)]
-        public string CodeCompany { get; set; }
+        public string? CodeCompany { get; set; }
 
         [StringLength(500)]
         public string? DescriptionCompany { get; set; }
