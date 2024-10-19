@@ -1,16 +1,16 @@
 ﻿using ERP_API.DTOs;
-using ERP_API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ERP_API.Interfaces;
 
 [ApiController]
 [Route("api/[controller]")]
 [Authorize] // Protege todos los métodos de este controlador
 public class PermissionController : ControllerBase
 {
-    private readonly PermissionService _permissionService;
+    private readonly IPermissionService _permissionService;
 
-    public PermissionController(PermissionService permissionService)
+    public PermissionController(IPermissionService permissionService)
     {
         _permissionService = permissionService;
     }

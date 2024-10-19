@@ -27,19 +27,19 @@ namespace ERP_API.Services
         }
 
 
-        public async Task<string> RegisterEmployeeAsync(ReqEmployeeDto ReqEmployeeDto)
+        public async Task<string> RegisterEmployee(ReqEmployeeDto ReqEmployeeDto)
         {
             using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
                     var responseJWT = await _bearerCode.VerficationCode();
-                    if (!responseJWT.Success)
+                    if (responseJWT == null)
                     {
                         throw new UnauthorizedAccessException("Acceso no autorizado.");
                     }
 
-                    var Company = responseJWT.Data.IdUserFkNavigation?.IdPersonFkNavigation?.IdCompanyFkNavigation;
+                    var Company = responseJWT.IdUserFkNavigation?.IdPersonFkNavigation?.IdCompanyFkNavigation;
 
 
                     if (await UserExistsByUserName(ReqEmployeeDto.UserDto.UserName, Company.IdCompany))

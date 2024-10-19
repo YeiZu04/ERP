@@ -1,5 +1,5 @@
 ﻿using ERP_API.DTOs;
-using ERP_API.Services;
+using ERP_API.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ERP_API.Controllers
@@ -8,9 +8,9 @@ namespace ERP_API.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly LoginService _authService;
+        private readonly ILoginService _authService;
 
-        public AuthController(LoginService authService)
+        public AuthController(ILoginService authService)
         {
             _authService = authService;
         }

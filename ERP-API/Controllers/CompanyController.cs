@@ -1,5 +1,5 @@
 ﻿using ERP_API.DTOs;
-using ERP_API.Services;
+using ERP_API.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,9 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 [Authorize] // Protege todos los métodos de este controlador
 public class CompanyController : ControllerBase
 {
-    private readonly CompanyService _companyService;
+    private readonly ICompanyService _companyService;
 
-    public CompanyController(CompanyService companyService)
+    public CompanyController(ICompanyService companyService)
     {
         _companyService = companyService;
     }

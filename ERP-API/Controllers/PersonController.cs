@@ -1,16 +1,16 @@
 ﻿using ERP_API.DTOs;
-using ERP_API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ERP_API.Interfaces;
 
 [ApiController]
 [Route("api/[controller]")]
 [Authorize] // Protege todos los métodos de este controlador
 public class PersonController : ControllerBase
 {
-    private readonly PersonService _personService;
+    private readonly IPersonService _personService;
 
-    public PersonController(PersonService personService)
+    public PersonController(IPersonService personService)
     {
         _personService = personService;
     }

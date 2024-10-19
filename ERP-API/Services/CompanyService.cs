@@ -25,7 +25,7 @@ namespace ERP_API.Services
         public async Task<ResCompanyDto> CreateCompany(ReqCompanyDto reqCompanyDto)
         {
             var responseJWT = await _bearerCode.VerficationCode();
-            if (!responseJWT.Success)
+            if (responseJWT == null)
                 throw new UnauthorizedAccessException("Acceso no autorizado.");
 
             var company = _mapper.Map<Company>(reqCompanyDto);
@@ -41,7 +41,7 @@ namespace ERP_API.Services
         public async Task<ResCompanyDto> UpdateCompany(ReqCompanyDto reqCompanyDto)
         {
             var responseJWT = await _bearerCode.VerficationCode();
-            if (!responseJWT.Success)
+            if ( responseJWT == null)
                 throw new UnauthorizedAccessException("Acceso no autorizado.");
 
             var company = await _context.Companies.FindAsync(reqCompanyDto.IdCompany);
@@ -61,7 +61,7 @@ namespace ERP_API.Services
         public async Task DeleteCompany(ReqCompanyDto reqCompanyDto)
         {
             var responseJWT = await _bearerCode.VerficationCode();
-            if (!responseJWT.Success)
+            if (responseJWT == null)
                 throw new UnauthorizedAccessException("Acceso no autorizado.");
 
             var company = await _context.Companies.FindAsync(reqCompanyDto.IdCompany);
@@ -77,7 +77,7 @@ namespace ERP_API.Services
         public async Task<List<ResCompanyDto>> ListCompanies()
         {
             var responseJWT = await _bearerCode.VerficationCode();
-            if (!responseJWT.Success)
+            if (responseJWT == null)
                 throw new UnauthorizedAccessException("Acceso no autorizado.");
 
             var companies = await _context.Companies

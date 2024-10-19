@@ -55,14 +55,14 @@ namespace ERP_API.Services
 
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.NameUser)
+                new Claim(ClaimTypes.Name.Trim(), user.NameUser.Trim())
             };
 
             foreach (var userRole in user.UserRoles)
             {
                 if (userRole.IdRoleFkNavigation != null)
                 {
-                    claims.Add(new Claim(ClaimTypes.Role, userRole.IdRoleFkNavigation.TypeRole));
+                    claims.Add(new Claim(ClaimTypes.Role, userRole.IdRoleFkNavigation.TypeRole.Trim()));
                 }
             }
 
@@ -86,12 +86,12 @@ namespace ERP_API.Services
         public async Task<string> Logout()
         {
             var responseJWT = await _bearerCode.VerficationCode();
-            if (!responseJWT.Success)
+            if (responseJWT == null)
             {
-                throw new UnauthorizedAccessException(responseJWT.ErrorMessage);
+                throw new UnauthorizedAccessException("Sesión no encontrada o inactiva");
             }
 
-            _context.Sessions.Remove(responseJWT.Data);
+            _context.Sessions.Remove(responseJWT);
             await _context.SaveChangesAsync();
 
             return "Sesión cerrada exitosamente.";
@@ -128,12 +128,12 @@ namespace ERP_API.Services
         public async Task<string> ChangePassword(ChangePasswordDto changePassword)
         {
             var responseJWT = await _bearerCode.VerficationCode();
-            if (!responseJWT.Success)
+            if (responseJWT == null)
             {
-                throw new UnauthorizedAccessException(responseJWT.ErrorMessage);
+                throw new UnauthorizedAccessException("Sesión no encontrada o inactiva");
             }
 
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.IdUser == responseJWT.Data.IdUserFk);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.IdUser == responseJWT.IdUserFk);
             if (user == null || !_passwordHash.VerifyPassword(user.PasswordUser, changePassword.Password))
             {
                 throw new UnauthorizedAccessException("Contraseña actual incorrecta.");
@@ -169,7 +169,10 @@ namespace ERP_API.Services
             {
                 Subject = new ClaimsIdentity(claims),
                 Expires = expire,
+                Issuer = _configuration["Jwt:Issuer"],  // Asegúrate de que esta configuración esté en appsettings.json
+                Audience = _configuration["Jwt:Audience"],  // Agrega la audiencia correcta
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+ 
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var jwtToken = tokenHandler.WriteToken(token);
