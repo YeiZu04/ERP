@@ -4,8 +4,6 @@ using ERP_API.Interfaces;
 using ERP_API.Models;
 using ERP_API.Services.Tools;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace ERP_API.Services
 {
@@ -26,9 +24,9 @@ namespace ERP_API.Services
         public async Task<ResPermissionDto> CreatePermission(ReqPermissionDto reqPermissionDto)
         {
             var responseJWT = await _bearerCode.VerficationCode();
-            if (!responseJWT.Success)
+            if (responseJWT == null)
             {
-                throw new UnauthorizedAccessException(responseJWT.ErrorMessage);
+                throw new UnauthorizedAccessException("Sesión no encontrada o inactiva");
             }
 
             var permission = _mapper.Map<Permission>(reqPermissionDto);
@@ -42,9 +40,9 @@ namespace ERP_API.Services
         public async Task<List<ResPermissionDto>> ListPermissions()
         {
             var responseJWT = await _bearerCode.VerficationCode();
-            if (!responseJWT.Success)
+            if (responseJWT == null)
             {
-                throw new UnauthorizedAccessException(responseJWT.ErrorMessage);
+                throw new UnauthorizedAccessException("Sesión no encontrada o inactiva");
             }
 
             var permissions = await _context.Permissions.ToListAsync();
@@ -55,9 +53,9 @@ namespace ERP_API.Services
         public async Task<ResPermissionDto> UpdatePermission(ReqPermissionDto reqPermissionDto)
         {
             var responseJWT = await _bearerCode.VerficationCode();
-            if (!responseJWT.Success)
+            if (responseJWT == null)
             {
-                throw new UnauthorizedAccessException(responseJWT.ErrorMessage);
+                throw new UnauthorizedAccessException("Sesión no encontrada o inactiva");
             }
 
             var permission = await _context.Permissions.FirstOrDefaultAsync(p => p.IdPermission == reqPermissionDto.IdPermission);
@@ -76,9 +74,9 @@ namespace ERP_API.Services
         public async Task<string> DeletePermission(ReqPermissionDto reqPermissionDto)
         {
             var responseJWT = await _bearerCode.VerficationCode();
-            if (!responseJWT.Success)
+            if (responseJWT == null)
             {
-                throw new UnauthorizedAccessException(responseJWT.ErrorMessage);
+                throw new UnauthorizedAccessException("Sesión no encontrada o inactiva");
             }
 
             var permission = await _context.Permissions.FirstOrDefaultAsync(p => p.IdPermission == reqPermissionDto.IdPermission);

@@ -23,56 +23,13 @@ namespace ERP_API.Services
         public async Task<ResPersonDto> UpdatePerson(ResPersonDto resPersonDto)
         {
             var responseJWT = await _bearerCode.VerficationCode();
-            if (!responseJWT.Success)
+            if ( responseJWT == null)
             {
 
-                throw new UnauthorizedAccessException(responseJWT.ErrorMessage);
-
-                var responseJWT = await _bearerCode.VerficationCode();
-                if (responseJWT.Success == false)
-                {
-                    return new ApiResponse<ResPersonDto>
-                    {
-                        Success = false,
-                        ErrorCode = responseJWT.ErrorCode,
-                        ErrorMessage = responseJWT.ErrorMessage
-                    };
-                }
-
-                var Company = responseJWT.Data.IdUserFkNavigation?.IdPersonFkNavigation?.IdCompanyFkNavigation;
-                // Buscar la persona existente en la base de datos
-                var person = await _context.Person.AsNoTracking().FirstOrDefaultAsync(p => p.PersonUUID == resPersonDto.PersonUUID && p.IdCompanyFk == Company.IdCompany);
-
-                // Verificar si la persona existe
-                if (person == null)
-                {
-                    return new ApiResponse<ResPersonDto>
-                    {
-                        Success = false,
-                        ErrorCode = ErrorCode.NotFound,
-                        ErrorMessage = "Persona no encontrada."
-                    };
-                }
-
-                // Mapear los datos del DTO al objeto Person
-                var newPerson= _mapper.Map<Person>(resPersonDto);
-                newPerson.IdPerson = person.IdPerson;
-                newPerson.IdCompanyFk = Company?.IdCompany;
-                newPerson.StatePerson = 1;
-
-                _context.Person.Update(newPerson);
-                await _context.SaveChangesAsync();
-
-                // Retornar respuesta exitosa
-                return new ApiResponse<ResPersonDto>
-                {
-                    Success = true,
-                    Data = _mapper.Map<ResPersonDto>(newPerson)
-                };
-
+                throw new UnauthorizedAccessException("Sesión no encontrada o inactiva");
             }
 
-            var company = responseJWT.Data.IdUserFkNavigation?.IdPersonFkNavigation?.IdCompanyFkNavigation;
+            var company = responseJWT.IdUserFkNavigation?.IdPersonFkNavigation?.IdCompanyFkNavigation;
 
             var person = await _context.Person
                 .AsNoTracking()
@@ -97,12 +54,12 @@ namespace ERP_API.Services
         public async Task<List<ResPersonDto>> ListPerson()
         {
             var responseJWT = await _bearerCode.VerficationCode();
-            if (!responseJWT.Success)
+            if (responseJWT == null)
             {
-                throw new UnauthorizedAccessException(responseJWT.ErrorMessage);
+                throw new UnauthorizedAccessException("Sesión no encontrada o inactiva");
             }
 
-            var companyId = responseJWT.Data.IdUserFkNavigation?.IdPersonFkNavigation?.IdCompanyFkNavigation;
+            var companyId = responseJWT.IdUserFkNavigation?.IdPersonFkNavigation?.IdCompanyFkNavigation;
 
             var people = await _context.Person
                 .Where(p => p.IdCompanyFk == companyId.IdCompany && p.StatePerson == 1)
@@ -114,12 +71,12 @@ namespace ERP_API.Services
         public async Task<string> DeletePerson(ResPersonDto resPersonDto)
         {
             var responseJWT = await _bearerCode.VerficationCode();
-            if (!responseJWT.Success)
+            if (responseJWT == null)
             {
-                throw new UnauthorizedAccessException(responseJWT.ErrorMessage);
+                throw new UnauthorizedAccessException("Sesión no encontrada o inactiva");
             }
 
-            var company = responseJWT.Data.IdUserFkNavigation?.IdPersonFkNavigation?.IdCompanyFkNavigation;
+            var company = responseJWT.IdUserFkNavigation?.IdPersonFkNavigation?.IdCompanyFkNavigation;
 
             var person = await _context.Person
                 .FirstOrDefaultAsync(p => p.PersonUUID == resPersonDto.PersonUUID && p.IdCompanyFk == company.IdCompany);

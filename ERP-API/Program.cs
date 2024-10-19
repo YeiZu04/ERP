@@ -28,6 +28,11 @@ builder.Services.AddHttpClient();
 builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddControllers();
+// Registrar los servicios necesarios
+builder.Services.AddScoped<PasswordHash>();  // Para el servicio EmployeeService
+builder.Services.AddScoped<BearerCode>();    // Para CompanyService, PermissionService, PersonService
+builder.Services.AddScoped<SendEmail>();     // Para LoginService
+builder.Services.AddScoped<RandomGenerator>();  // Si se necesita en algún otro servicio
 
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<ICompanyService, CompanyService>();
@@ -96,8 +101,7 @@ builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
-// Usar CORS
-app.UseCors("AllowAll");
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -107,7 +111,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+// Usar CORS
+app.UseCors("AllowAll");
 // Usar middleware de manejo de errores personalizado
 app.UseMiddleware<ErrorHandlerMiddleware>();
 
